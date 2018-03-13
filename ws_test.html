@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Page Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+</head>
+<body>
+
+    <div class="resp">
+
+    </div>    
+    <button  onclick="myFunction()">보내기테스트</button>
+    <button  onclick="testClose()">닫기테스트</button>
+    <script type="text/javascript">
+    $(function(){
+        ws = new WebSocket('ws://127.0.0.1:5000/test/echo');
+        ws.onmessage = function(event){
+                console.log('onmessage');
+                $('.resp').text(event.data);
+            }
+        ws.onopen = function(event) {
+            console.log('opened');
+        }
+        ws.onerror= function(event) {
+            console.log('error');
+            console.log(event);
+        }
+        ws.onclose = function(event){
+            console.log('closed');
+            console.log(event);
+        }
+    });
+        function myFunction(){
+            ws.send('some_data');
+        }
+        function testClose() {
+            ws.close();
+        }
+    </script>
+</body>
+</html>
