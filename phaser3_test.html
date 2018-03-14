@@ -11,25 +11,31 @@
     <script>
         $(function () {
             var game_screen_canvas = $('div.game-screen')[0];
-            console.log(game_screen_canvas);
             var config = {
                 type: Phaser.CANVAS,
                 parent: game_screen_canvas,
-                width: 800,
+                width: 600,
                 height: 600,
+                debugShowBody: true,
                 physics: {
                     default: 'arcade',
                     arcade: {
-                        gravity: { y: 0 }
+                        gravity: { y: 0 },
+                        debugShowBody : true
                     }
                 },
+                debug: true,
                 scene: {
                     preload: preload,
-                    create: create
+                    create: create,
+                    update: update
                 }
             };
 
             var game = new Phaser.Game(config);
+            var cursors = null;
+            var player = null;
+
 
             function preload() {
                 //this.load.setBaseURL('http://labs.phaser.io');
@@ -37,8 +43,6 @@
                 // this.load.image('logo', 'assets/sprites/phaser3-logo.png');
                 // this.load.image('red', 'assets/particles/red.png');
                 // this.load.image('block', 'assets/sprites/50x50-white.png');
-                console.log(window.location);
-                console.log(window.location.host);
                 this.load.setBaseURL('http://localhost:5000/static/');
 
                 this.load.image('sky', 'assets/skies/sky.png');
@@ -57,38 +61,81 @@
                     scale: { start: 1, end: 0 },
                     blendMode: 'ADD'
                 });
-                
-                
-                console.log(this.physics);
+
+                this.physics.world.createDebugGraphic();
+                this.physics.world.drawDebug = true;
                 var logo = this.physics.add.image(400, 100, 'logo');
 
                 logo.setMaxVelocity(100, 800);
-                logo.setVelocity(100, 200);
+                logo.setVelocity(200, 200);
                 logo.setBounce(0.5, 1.05);
                 logo.setCollideWorldBounds(true);
                 logo.body.enable = true;
                 // logo.body.bounce.y = 1.5;
                 emitter.startFollow(logo);
 
-                var blocks = this.physics.add.group(
-                    {
-                        key: 'block',
-                        repeat: 1,
-                        setXY: { x: 400, y: 100, stepX: 100, stepY: 500 }
-                    }
-                );
 
-                var ph = this.physics;
-                blocks.children.iterate(function (block) {
-                    block.setCollideWorldBounds(true);
-                    console.log(block);
-                    block.body.enable = true;
-                    block.body.bounce.y = 1.5;
-                    block.body.immovable = true;
-                    ph.add.collider(logo, block);
-                });
+                var opponent = this.physics.add.sprite(100, 100, 'block');
+                opponent.body.enable = true;
+                opponent.body.bounce.y = 1.5;
+                opponent.body.immovable = true;
+                opponent.setDebug(true, true, true);
+                // opponent.setScale(10, 1);
+                // opponent.setSize ( 500, 100);
+                opponent.setDisplaySize ( 200, 50);
+                opponent.setOrigin(0,0);
+                this.physics.add.collider(logo, opponent);
+
+                player = this.physics.add.sprite(400, 400, 'block');
+                player.body.enable = true;
+                player.body.bounce.y = 1.5;
+                player.body.immovable = true;
+                player.setOrigin(0,0);
+                player.setDisplaySize( 200, 50);
+                this.physics.add.collider(logo, player);
+
+                cursors = this.input.keyboard.createCursorKeys();
+                console.log(this);
+
+
+                // var blocks = this.physics.add.group(
+                //     {
+                //         key: 'block',
+                //         repeat: 1,
+                //         setXY: { x: 400, y: 100, stepX: 100, stepY: 500 }
+                //     }
+                // );
+
+                // var ph = this.physics;
+                // blocks.children.iterate(function (block) {
+                //     block.setCollideWorldBounds(true);
+                //     console.log(block);
+                //     block.body.enable = true;
+                //     block.body.bounce.y = 1.5;
+                //     block.body.immovable = true;
+                //     ph.add.collider(logo, block);
+                // });
+            }
+
+            function update() {
+
+                if (cursors.left.isDown) {
+                    player.setVelocityX(-160);
+
+                }
+                else if (cursors.right.isDown) {
+                    player.setVelocityX(160);
+
+                }
+                else {
+                    player.setVelocityX(0);
+
+                }
+                
             }
         });
+
+
 
     </script>
     <h1>Hello phaser!</h1>
