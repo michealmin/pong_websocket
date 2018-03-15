@@ -69,7 +69,7 @@
                 logo.setMaxVelocity(100, 800);
                 logo.setVelocity(200, 200);
                 logo.setBounce(0.5, 1.05);
-                logo.setCollideWorldBounds(true);
+                // logo.setCollideWorldBounds(true);
                 logo.body.enable = true;
                 // logo.body.bounce.y = 1.5;
                 emitter.startFollow(logo);
@@ -82,7 +82,7 @@
                 opponent.setDebug(true, true, true);
                 // opponent.setScale(10, 1);
                 // opponent.setSize ( 500, 100);
-                opponent.setDisplaySize ( 200, 50);
+                opponent.setDisplaySize ( 500, 50);
                 opponent.setOrigin(0,0);
                 this.physics.add.collider(logo, opponent);
 
@@ -96,6 +96,39 @@
 
                 cursors = this.input.keyboard.createCursorKeys();
                 console.log(this);
+
+                
+                //add bounds
+                //ToDo: 아래는 지형으로 바꿀 것
+                var left = this.physics.add.sprite(0, 0, 'sky');
+                left.body.enable=true;
+                left.body.immovable = true;
+                left.setOrigin(0,0);
+                left.setDisplaySize(10, 600);
+
+                var right = this.physics.add.sprite(590, 0, 'sky');
+                right.body.enable=true;
+                right.body.immovable = true;
+                right.setOrigin(0,0);
+                right.setDisplaySize(10, 600);
+
+                this.physics.add.collider(logo, left);
+                this.physics.add.collider(logo, right);
+
+                var top = this.physics.add.sprite(0,0);
+                //top.body.enable=true;
+                //top.body.immovable = true;
+                top.setOrigin(0,0);
+                top.setDisplaySize(600, 10);
+
+                var bottom = this.physics.add.sprite(0,590);
+                //top.body.enable=true;
+                //top.body.immovable = true;
+                bottom.setOrigin(0,0);
+                bottom.setDisplaySize(600, 10);
+                
+                this.physics.add.overlap(logo, top, function(){ console.log('collide on top');} );
+                this.physics.add.overlap(logo, bottom, function(){ console.log('collide on bottom');} );
 
 
                 // var blocks = this.physics.add.group(
