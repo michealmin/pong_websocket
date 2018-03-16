@@ -7,9 +7,13 @@
 </head>
 
 <body>
-
     <script>
-        $(function () {
+        //ToDo
+        // 자 이제 점수판도 보이고
+        // 코드 정리 외에 남은건
+        // 게임오버 / 시작하기
+
+        $(function() {
             var game_screen_canvas = $('div.game-screen')[0];
             var config = {
                 type: Phaser.CANVAS,
@@ -20,8 +24,10 @@
                 physics: {
                     default: 'arcade',
                     arcade: {
-                        gravity: { y: 0 },
-                        debugShowBody : true
+                        gravity: {
+                            y: 0
+                        },
+                        debugShowBody: true
                     }
                 },
                 debug: true,
@@ -45,10 +51,36 @@
                 // this.load.image('block', 'assets/sprites/50x50-white.png');
                 this.load.setBaseURL('http://localhost:5000/static/');
 
+                this.load.spritesheet('button', 'assets/ui/flixel-button.png', {
+                    frameWidth: 80,
+                    frameHeight: 20
+                });
+                this.load.bitmapFont('hyperdrive', 'assets/fonts/bitmap/hyperdrive.png', 'assets/fonts/bitmap/hyperdrive.xml');
+
                 this.load.image('sky', 'assets/skies/sky.png');
                 this.load.image('logo', 'assets/sprites/aqua_ball.png');
                 this.load.image('red', 'assets/particles/red.png');
                 this.load.image('block', 'assets/sprites/50x50-white.png');
+            }
+
+            var objects = {
+                player_blocks: [],
+                ball: null,
+                scoreboard: []
+            }
+
+            var score = [0, 0];
+
+            function resetGame() {
+                objects.ball.setMaxVelocity(100, 800);
+            }
+
+            function resetRound() {;
+
+                objects.ball.setVelocity(200, 200);
+                objects.ball.setBounce(0.5, 1.05);
+                objects.ball.setPosition(400, 100);
+
             }
 
             function create() {
@@ -58,7 +90,10 @@
 
                 var emitter = particles.createEmitter({
                     speed: 100,
-                    scale: { start: 1, end: 0 },
+                    scale: {
+                        start: 1,
+                        end: 0
+                    },
                     blendMode: 'ADD'
                 });
 
@@ -66,9 +101,6 @@
                 this.physics.world.drawDebug = true;
                 var logo = this.physics.add.image(400, 100, 'logo');
 
-                logo.setMaxVelocity(100, 800);
-                logo.setVelocity(200, 200);
-                logo.setBounce(0.5, 1.05);
                 // logo.setCollideWorldBounds(true);
                 logo.body.enable = true;
                 // logo.body.bounce.y = 1.5;
@@ -82,53 +114,92 @@
                 opponent.setDebug(true, true, true);
                 // opponent.setScale(10, 1);
                 // opponent.setSize ( 500, 100);
-                opponent.setDisplaySize ( 500, 50);
-                opponent.setOrigin(0,0);
+                opponent.setDisplaySize(10, 50);
+                opponent.setOrigin(0, 0);
                 this.physics.add.collider(logo, opponent);
 
                 player = this.physics.add.sprite(400, 400, 'block');
                 player.body.enable = true;
                 player.body.bounce.y = 1.5;
                 player.body.immovable = true;
-                player.setOrigin(0,0);
-                player.setDisplaySize( 200, 50);
+                player.setOrigin(0, 0);
+                player.setDisplaySize(100, 50);
                 this.physics.add.collider(logo, player);
+
+                objects.player_blocks.push(opponent);
+                objects.player_blocks.push(player);
+                objects.ball = logo;
 
                 cursors = this.input.keyboard.createCursorKeys();
                 console.log(this);
 
-                
+
                 //add bounds
                 //ToDo: 아래는 지형으로 바꿀 것
                 var left = this.physics.add.sprite(0, 0, 'sky');
-                left.body.enable=true;
+                left.body.enable = true;
                 left.body.immovable = true;
-                left.setOrigin(0,0);
+                left.setOrigin(0, 0);
                 left.setDisplaySize(10, 600);
 
                 var right = this.physics.add.sprite(590, 0, 'sky');
-                right.body.enable=true;
+                right.body.enable = true;
                 right.body.immovable = true;
-                right.setOrigin(0,0);
+                right.setOrigin(0, 0);
                 right.setDisplaySize(10, 600);
 
                 this.physics.add.collider(logo, left);
                 this.physics.add.collider(logo, right);
 
-                var top = this.physics.add.sprite(0,0);
+                var top = this.physics.add.sprite(0, 0);
                 //top.body.enable=true;
                 //top.body.immovable = true;
-                top.setOrigin(0,0);
+                top.setOrigin(0, 0);
                 top.setDisplaySize(600, 10);
 
-                var bottom = this.physics.add.sprite(0,590);
+                var bottom = this.physics.add.sprite(0, 590);
                 //top.body.enable=true;
                 //top.body.immovable = true;
-                bottom.setOrigin(0,0);
+                bottom.setOrigin(0, 0);
                 bottom.setDisplaySize(600, 10);
-                
-                this.physics.add.overlap(logo, top, function(){ console.log('collide on top');} );
-                this.physics.add.overlap(logo, bottom, function(){ console.log('collide on bottom');} );
+
+                this.physics.add.overlap(logo, top, function() {
+                    console.log('collide on top');
+                    ++score[1];
+                    console.log(score[1]);
+                    objects.scoreboard[1].setText(score[1].toString());
+                    resetRound();
+                });
+                this.physics.add.overlap(logo, bottom, function() {
+                    console.log('collide on bottom');
+                    ++score[0];
+                    console.log(score[0]);
+                    objects.scoreboard[0].setText(score[0].toString());
+                    resetRound();
+                });
+                objects.scoreboard.push(this.add.text(10, 10, score[0].toString()));
+                objects.scoreboard.push(this.add.text(10, 590, score[1].toString()));
+
+
+                this.input.on('gameobjectover', function(pointer, button) {
+                    setButtonFrame(button, 0);
+                });
+                this.input.on('gameobjectout', function(pointer, button) {
+                    setButtonFrame(button, 1);
+                });
+                this.input.on('gameobjectdown', function(pointer, button) {
+                    // this.sound.playAudioSprite('sfx', button.name);
+
+                    setButtonFrame(button, 2);
+                    button.setVisible(false);
+                    console.log('button deactivate');
+                    console.log(button);
+                    resetRound();
+
+                }, this);
+                this.input.on('gameobjectup', function(pointer, button) {
+                    setButtonFrame(button, 0);
+                });
 
 
                 // var blocks = this.physics.add.group(
@@ -148,6 +219,8 @@
                 //     block.body.immovable = true;
                 //     ph.add.collider(logo, block);
                 // });
+                makeButton(this, 'Start', 200, 200);
+                resetGame();
             }
 
             function update() {
@@ -155,21 +228,29 @@
                 if (cursors.left.isDown) {
                     player.setVelocityX(-160);
 
-                }
-                else if (cursors.right.isDown) {
+                } else if (cursors.right.isDown) {
                     player.setVelocityX(160);
 
-                }
-                else {
+                } else {
                     player.setVelocityX(0);
 
                 }
-                
+
+            }
+
+            function makeButton(_this, name, x, y) {
+                var button = _this.add.image(x, y, 'button', 1).setInteractive();
+                button.name = name;
+                button.setScale(4, 3);
+
+                var text = _this.add.bitmapText(x - 40, y - 20, 'hyperdrive', name, 34);
+                text.x += (button.width - text.width) / 2;
+            }
+
+            function setButtonFrame(button, frame) {
+                button.frame = button.scene.textures.getFrame('button', frame);
             }
         });
-
-
-
     </script>
     <h1>Hello phaser!</h1>
     <div class="game-screen">
