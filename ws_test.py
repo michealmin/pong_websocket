@@ -1,7 +1,15 @@
-from flask import Flask, Blueprint, send_from_directory, send_file
+
 from flask_sockets import Sockets
+from werkzeug.serving import run_with_reloader
+from werkzeug.debug import DebuggedApplication
+from flask import Flask, Blueprint, send_file
 from gevent import util
 import logging
+
+logging.basicConfig(level=logging.DEBUG)
+LOG = logging.getLogger('wstest')
+LOG.setLevel(logging.DEBUG)
+
 
 html = Blueprint(r'html', __name__)
 ws = Blueprint(r'ws', __name__)
@@ -33,12 +41,27 @@ sockets = Sockets(app)
 app.register_blueprint(html, url_prefix=r'/')
 sockets.register_blueprint(ws, url_prefix=r'/test')
 
-
-if __name__ == "__main__":
+@run_with_reloader
+def run_server():
     from gevent import pywsgi
     from geventwebsocket.handler import WebSocketHandler
+    http_server = pywsgi.WSGIServer(('', 5000), DebuggedApplication(app), handler_class=WebSocketHandler, log=app.logger)
+    http_server.serve_forever()
+
+
+if __name__ == "__main__":
+    # LOG.debug('main=-==-=-=-=-=-=-=-=-=')
+    run_server()
+    test = 1
+    from gevent import pywsgi
+    from geventwebsocket.handler import WebSocketHandler
+    # print(app.logger)
+    # print(app.logger.write)
+    # print(app.logger.log)
+    app.debug = True
+    app.logger.setLevel(logging.DEBUG)
 
     server = pywsgi.WSGIServer(('0', 5000), app, handler_class=WebSocketHandler, log=app.logger)
-    app.logger.setLevel(logging.DEBUG)
-    app.debug = True
+
+
     server.serve_forever()

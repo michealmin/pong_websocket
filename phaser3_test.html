@@ -4,14 +4,17 @@
 <head>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script src="//cdn.jsdelivr.net/npm/phaser@3.0.0/dist/phaser.min.js"></script>
+    <script type="module" src="static/js/game_main.js"></script>
 </head>
 
 <body>
+
     <script>
         //ToDo
         // 자 이제 점수판도 보이고
         // 코드 정리 외에 남은건
         // 게임오버 / 시작하기
+
 
         $(function() {
             var game_screen_canvas = $('div.game-screen')[0];
@@ -75,9 +78,30 @@
                 objects.ball.setMaxVelocity(100, 800);
             }
 
+            var start_button = null;
+            var round_finished = false;
+
+            function onRoundFinished() {
+                round_finished = true;
+                var matchScore = 2;
+                if (matchScore <= score[0] ||
+                    matchScore <= score[1]) {
+                    console.log('Game Finished');
+                    start_button.setVisible(true);
+                } else {
+                    startRound();
+                }
+            }
+
+            function startRound() {
+                resetRound();
+                round_finished = false;
+                objects.ball.setVelocity(200, 200);
+            }
+
             function resetRound() {;
 
-                objects.ball.setVelocity(200, 200);
+                objects.ball.setVelocity(0, 0);
                 objects.ball.setBounce(0.5, 1.05);
                 objects.ball.setPosition(400, 100);
 
@@ -96,6 +120,13 @@
                     },
                     blendMode: 'ADD'
                 });
+                console.log(this);
+                console.log(this.boot);
+                this.focus = function(a, ...args) {
+                    console.log('focus');
+                    console.log(a);
+                    console.log(args);
+                }
 
                 this.physics.world.createDebugGraphic();
                 this.physics.world.drawDebug = true;
@@ -131,7 +162,6 @@
                 objects.ball = logo;
 
                 cursors = this.input.keyboard.createCursorKeys();
-                console.log(this);
 
 
                 //add bounds
@@ -164,42 +194,35 @@
                 bottom.setDisplaySize(600, 10);
 
                 this.physics.add.overlap(logo, top, function() {
+                    if (round_finished)
+                        return;
                     console.log('collide on top');
                     ++score[1];
                     console.log(score[1]);
                     objects.scoreboard[1].setText(score[1].toString());
-                    resetRound();
+                    onRoundFinished();
+
                 });
                 this.physics.add.overlap(logo, bottom, function() {
+                    if (round_finished)
+                        return;
                     console.log('collide on bottom');
                     ++score[0];
                     console.log(score[0]);
                     objects.scoreboard[0].setText(score[0].toString());
-                    resetRound();
+                    onRoundFinished();
                 });
                 objects.scoreboard.push(this.add.text(10, 10, score[0].toString()));
                 objects.scoreboard.push(this.add.text(10, 590, score[1].toString()));
 
+                var input_for_gameobject_handlers = {};
 
-                this.input.on('gameobjectover', function(pointer, button) {
-                    setButtonFrame(button, 0);
-                });
-                this.input.on('gameobjectout', function(pointer, button) {
-                    setButtonFrame(button, 1);
-                });
-                this.input.on('gameobjectdown', function(pointer, button) {
-                    // this.sound.playAudioSprite('sfx', button.name);
+                function registerInputForGameObject(go, handlers) {
+                    input_for_gameobject_handlers[go.key] = handlers;
+                }
 
-                    setButtonFrame(button, 2);
-                    button.setVisible(false);
-                    console.log('button deactivate');
-                    console.log(button);
-                    resetRound();
+                start_button = makeButton(this, 'Start', 'StartText', 200, 200, startRound);
 
-                }, this);
-                this.input.on('gameobjectup', function(pointer, button) {
-                    setButtonFrame(button, 0);
-                });
 
 
                 // var blocks = this.physics.add.group(
@@ -219,7 +242,7 @@
                 //     block.body.immovable = true;
                 //     ph.add.collider(logo, block);
                 // });
-                makeButton(this, 'Start', 200, 200);
+
                 resetGame();
             }
 
@@ -238,17 +261,61 @@
 
             }
 
-            function makeButton(_this, name, x, y) {
-                var button = _this.add.image(x, y, 'button', 1).setInteractive();
+            function setButtonFrame(button, frame) {
+                button.frame = button.scene.textures.getFrame('button', frame);
+            }
+
+            function makeButton(scene, name, text, x, y, on_click_handler) {
+                var button = scene.add.image(x, y, 'button', 1).setInteractive();
                 button.name = name;
                 button.setScale(4, 3);
 
-                var text = _this.add.bitmapText(x - 40, y - 20, 'hyperdrive', name, 34);
+                var text = scene.add.bitmapText(x - 40, y - 20, 'hyperdrive', text, 34);
                 text.x += (button.width - text.width) / 2;
-            }
 
-            function setButtonFrame(button, frame) {
-                button.frame = button.scene.textures.getFrame('button', frame);
+                var btn_group = scene.add.group();
+                btn_group.add(button);
+                btn_group.add(text);
+
+
+
+
+                function setVisible(value) {
+                    btn_group.getChildren().forEach(function(elem) {
+                        elem.setVisible(value);
+                    });
+                }
+
+                scene.input.on('gameobjectover', function(pointer, btn) {
+                    if (btn.key == button.key)
+                        setButtonFrame(button, 0);
+
+                });
+
+                scene.input.on('gameobjectout', function(pointer, btn) {
+                    if (btn.key == button.key)
+                        setButtonFrame(button, 1);
+                });
+                scene.input.on('gameobjectdown', function(pointer, btn) {
+                    if (btn.key == button.key) {
+                        setButtonFrame(button, 2);
+                        setVisible(false);
+                        console.log('button deactivate');
+                        on_click_handler();
+                    }
+
+                }, scene);
+                scene.input.on('gameobjectup', function(pointer, btn) {
+                    if (btn.key == button.key)
+                        setButtonFrame(button, 0);
+                });
+
+                return {
+                    button: button,
+                    text: text,
+                    group: btn_group,
+                    setVisible: setVisible
+                }
             }
         });
     </script>
