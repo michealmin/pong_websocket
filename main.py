@@ -1,45 +1,50 @@
-
+import logging
 from flask_sockets import Sockets
 from werkzeug.serving import run_with_reloader
 from werkzeug.debug import DebuggedApplication
 from flask import Flask, Blueprint, send_file
-from gevent import util
-import logging
+from blueprints.lobby import lobby
+from blueprints.room import room
+
 
 logging.basicConfig(level=logging.DEBUG)
 LOG = logging.getLogger('wstest')
 LOG.setLevel(logging.DEBUG)
 
 
-html = Blueprint(r'html', __name__)
-ws = Blueprint(r'ws', __name__)
-
-
-@html.route('/')
-def hello():
-    return send_file('main.html')
-
-@ws.route('/echo')
-def echo_socket(socket):
-    # import gevent
-    # def test():
-    #   while True:
-    #     gevent.sleep(1)
-    #     socket.send('greenlet')
-    #
-    # t = gevent.spawn(test)
-    # t.start()
-    while not socket.closed:
-        message = socket.receive()
-        socket.send(message)
+# html = Blueprint(r'html', __name__)
+# ws = Blueprint(r'ws', __name__)
+#
+#
+# @html.route('/')
+# def hello():
+#     return send_file('main.html')
+#
+# @ws.route('/echo')
+# def echo_socket(socket):
+#     # import gevent
+#     # def test():
+#     #   while True:
+#     #     gevent.sleep(1)
+#     #     socket.send('greenlet')
+#     #
+#     # t = gevent.spawn(test)
+#     # t.start()
+#     while not socket.closed:
+#         message = socket.receive()
+#         socket.send(message)
 
 app = Flask(__name__, static_url_path='/static')
 app.debug = True
 
 sockets = Sockets(app)
 
-app.register_blueprint(html, url_prefix=r'/')
-sockets.register_blueprint(ws, url_prefix=r'/test')
+app.register_blueprint(lobby, url_prefix=r'/lobby')
+sockets.register_blueprint(room, url_prefix=r'/room')
+
+@app.route('/')
+def main():
+    return send_file('main.html')
 
 @run_with_reloader
 def run_server():
