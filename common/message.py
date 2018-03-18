@@ -1,6 +1,7 @@
 from common import errors
 import abc
 import copy
+import json
 
 # Cli -> Svr
 class CSMessageTypes:
@@ -27,5 +28,6 @@ def build_response(msg_type, result, data, error=None):
     ret = copy.deepcopy(data)
     ret['type'] = msg_type
     ret['result'] = result
-    ret['error'] = error
-    return ret
+    if None is not error:
+        ret['error'] = error
+    return json.dumps(ret)

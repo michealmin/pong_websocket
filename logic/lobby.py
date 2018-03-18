@@ -1,5 +1,6 @@
 from .room import Room
 from common import jwt_token
+from common import errors
 
 class Lobby():
     def __init__(self):
@@ -22,8 +23,16 @@ class Lobby():
         else:
             return self.create_room()
 
-    def process_enter_room(self, player, token):
+    def process_enter_room(self, player, room_no, token):
         tok_info = jwt_token.decode_jwt(token)
+        if tok_info['room_no'] != room_no:
+            raise errors.LobbyError('Invalid token')
+
+        room = self._rooms[room_no]
+        # ToDo : 방이 차있으면 에러 전달
+        room.add_player(player)
+        # ToDo : Player dㅔ서 onmessage 뜨면 룸으로 전달하게
+        return True;
 
 
 

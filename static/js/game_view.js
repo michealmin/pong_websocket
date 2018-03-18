@@ -5,11 +5,12 @@ import { GameScene } from "./scene/game_scene.js";
 import { UIScene } from "./scene/ui_scene.js";
 
 class GameView {
-    constructor() {
+    constructor(url_base) {
         this.config = GameConfig;
-        this._game_scene = new GameScene();
-        this._ui_scene = new UIScene();
+        this._game_scene = new GameScene(url_base);
+        this._ui_scene = new UIScene(url_base);
         this._phaser_game = null;
+        this._url_base = url_base;
     }
 
     get game_scene() {

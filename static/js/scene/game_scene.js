@@ -5,11 +5,12 @@ import { Button } from "./button.js";
 
 
 class GameScene {
-    constructor() {
+    constructor(url_base) {
         this._player_blocks = Array(2);
         this.ball = null;
         this.edges = Object();
         this._my_position = -1; //invalid
+        this._url_base = url_base;
 
         //callbacks
         this._on_edge_overlapped = function(player_position) {
@@ -56,8 +57,11 @@ class GameScene {
         var self = this;
         return function() {
             var this_scene = this;
-            //ToDo. windows location 같은걸 써서 바꿀 것
-            this_scene.load.setBaseURL('http://localhost:5000/static/');
+            var base_url = self._url_base + 'static/';
+            console.log('base_url');
+            console.log(self._url_base);
+            console.log(base_url);
+            this_scene.load.setBaseURL(base_url);
 
             this_scene.load.spritesheet('button', 'assets/ui/flixel-button.png', {
                 frameWidth: 80,

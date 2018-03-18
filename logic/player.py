@@ -1,5 +1,5 @@
 import json
-from common.errors import PlayerException
+from common.errors import PlayerError
 
 class Player:
     def __init__(self, name, ws):
@@ -21,7 +21,7 @@ class Player:
 
     def exit_room(self):
         if None is self._room:
-            raise PlayerException(self, 'Not in room.')
+            raise PlayerError(self, 'Not in room.')
 
         self._room.remove_player(self)
 
@@ -30,6 +30,12 @@ class Player:
 
     def send_msg(self, msg):
         self._ws.send(msg)
+
+    def on_message(self, msg):
+        return self._handle_msg(self, msg)
+
+    def set_msg_handler(self, handler):
+        self._handle_msg = handler
 
     def __str__(self):
         info = {

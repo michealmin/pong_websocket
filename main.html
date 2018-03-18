@@ -6,8 +6,45 @@
     <script src="/static/phaser.js"></script>
     <!-- <script type="module" src="static/js/game_main.js"></script> -->
     <script type="module">
-        import { game_main } from '/static/js/game_main.js'; $(game_main());
+        import {GameMain} from '/static/js/game_main.js';
+
+        // $(function () {
+        //     var href = windows.location.href;
+        //     var game_main = new GameMain(href);
+        //     game_main.createGame();
+        // });
+
+        function enterRoom(room_no, token, player_name, ) {
+            var href = window.location.host;
+            var game_main = new GameMain(href);
+            game_main.initConnection('ws://' + window.location.host + '/room/');
+            game_main.enterRoom(room_no, token, player_name);
+        }
+
+
+
+        function login() {
+            console.log('login');
+            $.ajax({
+                url: '/lobby/room',
+                type: "POST",
+                data: JSON.stringify({
+                    type: 'requestEnterRoom'
+                }),
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function(data) {
+                    console.log('recv room data : ' + JSON.stringify(data));
+                    enterRoom(data.room_no, data.token, $('input#player-name').text());
+                }
+            });
+        }
+
+        $(function () {
+            $('button#login').click(login);
+        });
     </script>
+
 </head>
 
 <body>
@@ -15,11 +52,11 @@
     <div class="login-screen">
         <label for="player-name">이름</label>
         <input type="text" id="player-name" />
-        <button id="login" onclick="login();">로그인</button>
+        <button id="login">로그인</button>
     </div>
 
     <h1>Hello phaser!</h1>
-    <div class="game-screen">
+    <div class="game-screen ">
     </div>
 </body>
 

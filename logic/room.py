@@ -1,6 +1,7 @@
 import json
 import logging
-from common.errors import RoomException
+from common.errors import RoomError
+from common.message import *
 
 
 LOG = logging.getLogger(__name__)
@@ -31,13 +32,24 @@ class Room:
 
         self._players[empty_slot] = player
         player.position = empty_slot
+
+        def msg_handler(player, msg):
+            self.msg_handler(player, msg)
+
+        player.set_msg_handler(msg_handler)
+
+        player.send_msg(build_response(SCMessageTypes.enter_room_resp, 'ok',
+                                       {}))
         return True
+
+    def msg_handler(self, player, msg):
+        LOG.debug('Msg recved from {} : {}'.format(plyaer, msg))
 
     def remove_player(self, player):
         position = player.position
         if None is self._players[position]\
             or self._players[player.position] is not player:
-            raise RoomException(
+            raise RoomError(
                 self,
                 'Removeplayer err. Cannot find player {}'.format(player))
 

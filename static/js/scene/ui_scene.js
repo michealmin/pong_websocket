@@ -3,7 +3,8 @@
 import { Button } from "./button.js";
 
 class UIScene {
-    constructor() {
+    constructor(url_base) {
+        this._url_base = url_base;
         this._on_start_clicked = function() {
 
         }
@@ -35,7 +36,8 @@ class UIScene {
             var this_scene = this;
             console.log('ui preload');
 
-            this_scene.load.setBaseURL('http://localhost:5000/static/');
+            var base_url = self._url_base + 'static/';
+            this_scene.load.setBaseURL(base_url);
             this_scene.load.spritesheet('button', 'assets/ui/flixel-button.png', {
                 frameWidth: 80,
                 frameHeight: 20

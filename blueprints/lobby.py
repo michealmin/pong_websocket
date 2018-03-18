@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, jsonify, request, make_response
 from logic import lobby_instance
 import jwt
 import datetime
@@ -17,8 +17,13 @@ def rooms():
     rooms = [str(r) for r in lobby_instance.rooms]
     return jsonify(rooms)
 
+
 @lobby.route('/room', methods=['POST'])
 def enter_room():
+    payload = request.get_json()
+    if 'type' not in payload or 'requestEnterRoom' != payload['type']:
+        return make_response({'result':'failed', 'error':'Invalid request'}, 400)
+
     room = lobby_instance.get_joinable_room()
     cur_timestamp = datetime.datetime.now().timestamp()
 
@@ -30,7 +35,7 @@ def enter_room():
 
     return jsonify(
         {
-            'result': 'succeed',
+            'result': 'ok',
             'room_no': room.room_no,
             'token': token
         }
