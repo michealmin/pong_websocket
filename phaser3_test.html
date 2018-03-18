@@ -3,7 +3,7 @@
 
 <head>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-    <script src="/static/phaser.js"></script>
+    <script src="/static/phaser.min.js"></script>
     <!-- <script type="module" src="static/js/game_main.js"></script> -->
     <script type="module">
         import { game_main } from '/static/js/game_main.js'; $(game_main());
@@ -12,7 +12,11 @@
 
 <body>
 
-
+    <div class="login-screen">
+        <label for="player-name">이름</label>
+        <input type="text" id="player-name" />
+        <button id="login" onclick="login();">로그인</button>
+    </div>
 
     <h1>Hello phaser!</h1>
     <div class="game-screen">
