@@ -17,7 +17,7 @@ ws = Blueprint(r'ws', __name__)
 
 @html.route('/')
 def hello():
-    return send_file('phaser3_test.html')
+    return send_file('main.html')
 
 @ws.route('/echo')
 def echo_socket(socket):
