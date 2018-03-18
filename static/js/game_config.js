@@ -14,8 +14,8 @@ class GameConfig {
         var width = 100;
         var height = 40;
 
-        var pos_x = (screen_size.width / 2) - width;
-        var pos_y = [100, 500];
+        var pos_x = (screen_size.width / 2) - (width / 2);
+        var pos_y = [50, 510];
         var block_pos_and_size = [{
                 width: width,
                 height: height,

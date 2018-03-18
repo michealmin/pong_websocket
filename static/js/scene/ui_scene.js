@@ -25,6 +25,10 @@ class UIScene {
         }
     }
 
+    showStausText(text) {
+
+    }
+
     get preload() {
         var self = this;
         return function() {
@@ -36,6 +40,7 @@ class UIScene {
                 frameWidth: 80,
                 frameHeight: 20
             });
+            console.log(this_scene);
             this_scene.load.bitmapFont('hyperdrive', 'assets/fonts/bitmap/hyperdrive.png', 'assets/fonts/bitmap/hyperdrive.xml');
         }
     }
@@ -45,11 +50,26 @@ class UIScene {
         return function() {
             var this_scene = this;
             console.log('ui create');
-            this_scene.add.text(100, 300, "hello world other scene!!");
+            var text = this_scene.add.text(100, 300, "!", {
+                fill: 'rgba(0,255,0,1)',
+                fontSize: 40,
+                fixedWidth: 400,
+                fixedHeight: 100
+            });
+
+            text.setAlign('center');
+            text.setWordWrapWidth('400', false);
+            text.setText('setText');
+            this.center_text = text;
+
             // self._start_button = new Button(this_scene, 'Start', 'StartText', 200, 200, function() {
             //     self._on_start_clicked();
             // });
         }
+    }
+
+    setCenterText(text) {
+        this.center_text.setText(text);
     }
 };
 

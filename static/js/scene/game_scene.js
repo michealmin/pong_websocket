@@ -104,8 +104,12 @@ class GameScene {
             // function registerInputForGameObject(go, handlers) {
             //     input_for_gameobject_handlers[go.key] = handlers;
             // }
-
-            self._start_button = new Button(this_scene, 'Start', 'StartText', 200, 200, function() {
+            var screen_size = self.config.screen_size;
+            var x = (screen_size.width / 2);
+            var y = (screen_size.height / 2);
+            console.log(x);
+            console.log(y);
+            self._start_button = new Button(this_scene, 'Start', 'StartText', 300, y, function() {
                 self._on_start_clicked();
             });
             self.resetRound();
@@ -142,12 +146,16 @@ class GameScene {
         this.ball.setVelocity(0, 0);
         this.ball.setBounce(0.5, 1.05);
         this.ball.setPosition(screen_size.width / 2, screen_size.height / 2);
+        this.ball.setVisible(false);
+        this.ball_emitter.setVisible(false);
     }
 
     startRound() {
         this.resetRound();
         // round_finished = false;
         this.ball.setVelocity(200, 200);
+        this.ball.setVisible(true);
+        this.ball_emitter.setVisible(true);
     }
 
     createBall(this_scene) {
@@ -171,6 +179,7 @@ class GameScene {
         emitter.startFollow(ball);
 
         this.ball = ball;
+        this.ball_emitter = emitter;
     }
 
     createPlayerBlocks(this_scene) {
