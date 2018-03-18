@@ -1,4 +1,5 @@
 from .room import Room
+from common import jwt_token
 
 class Lobby():
     def __init__(self):
@@ -20,5 +21,9 @@ class Lobby():
             return rooms[0]
         else:
             return self.create_room()
+
+    def process_enter_room(self, player, token):
+        tok_info = jwt_token.decode_jwt(token)
+
 
 
