@@ -12,6 +12,15 @@ class CSMessageTypes:
 class SCMessageTypes:
     enter_room_resp = 'EnterRoomResp'
 
+# Notify
+class ScMessgeNotifyTypes:
+    enter_room_ntf = 'EnterRoomNtf'
+
+
+def build_notify(msg_type, data):
+    ret = copy.deepcopy(data)
+    ret['type'] = msg_type
+    return json.dumps(ret)
 
 def build_response(msg_type, result, data, error=None):
 

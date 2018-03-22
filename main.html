@@ -15,10 +15,15 @@
         // });
 
         function enterRoom(room_no, token, player_name, ) {
-            var href = window.location.host;
-            var game_main = new GameMain(href);
+            var ori = window.location.origin;
+            var game_main = new GameMain(ori);
+            game_main.createGame();
             game_main.initConnection('ws://' + window.location.host + '/room/');
             game_main.enterRoom(room_no, token, player_name);
+            game_main.onEnterRoom = function() {
+                $('div.login-scree').hide();
+                $('div.game-screen').show();
+            }
         }
 
 
@@ -35,7 +40,7 @@
                 dataType: "json",
                 success: function(data) {
                     console.log('recv room data : ' + JSON.stringify(data));
-                    enterRoom(data.room_no, data.token, $('input#player-name').text());
+                    enterRoom(data.room_no, data.token, $('input#player-name')[0].value);
                 }
             });
         }
@@ -55,7 +60,6 @@
         <button id="login">로그인</button>
     </div>
 
-    <h1>Hello phaser!</h1>
     <div class="game-screen ">
     </div>
 </body>

@@ -30,7 +30,12 @@ class GameMain {
         this._ws.onmessage = function(evt) {
             console.log('receved ' + evt);
             console.log(evt.data);
-            self.onSocketMessage(evt)
+            try {
+                self.onSocketMessage(JSON.parse(evt.data));
+            } catch (e) {
+                console.error(e);
+            }
+
         }
 
         this._ws.onclose = function() {
@@ -50,8 +55,34 @@ class GameMain {
         this._msg_queue = Array();
     }
 
-    onSocketMessage(evt) {
+    onSocketMessage(msg) {
+        console.log(msg);
 
+        if (msg.type == "EnterRoomResp") {
+            this.onEnterRoom();
+
+            this._game_view.game_scene.my_position = msg.position;
+            var other_player = msg.other_player;
+            var game_scene = this._game_view.game_scene;
+
+            // ToDo : postBoot 으로 옮길 것
+            setTimeout(function() {
+                    game_scene.showPlayer(msg.position, true);
+                    other_player.forEach(function(elem) {
+                        game_scene.setPlayerName(elem.position, elem.name);
+                        game_scene.showPlayer(elem.position, true);
+                    });
+                },
+                100);
+        } else if (msg.type == "EnterRoomNtf") {
+            var game_scene = this._game_view.game_scene;
+
+            // ToDo : postBoot 으로 옮길 것
+            setTimeout(function() {
+                game_scene.setPlayerName(msg.position, msg.name);
+                game_scene.showPlayer(msg.position, true);
+            }, 100);
+        }
     }
 
     onSocketClose() {
@@ -88,7 +119,6 @@ class GameMain {
         game_view.initPhaser(game_screen);
 
         var game_logic = new GameLogic(game_view);
-        game_view.game_scene.my_position = 0;
 
         this._game_view = game_view;
         this._game_logic = game_logic;

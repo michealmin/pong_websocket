@@ -39,11 +39,19 @@ class Room:
         player.set_msg_handler(msg_handler)
 
         player.send_msg(build_response(SCMessageTypes.enter_room_resp, 'ok',
-                                       {}))
+                                       {'position': player.position, 'other_player' :[{'position': p.position,'name': p.name }
+                                        for _, p in self._players.items() if p is not None and p is not player
+                                        ]}))
+
+        for pos, player in self._players.items():
+            if player:
+                player.send_msg(build_notify(ScMessgeNotifyTypes.enter_room_ntf, {
+                    'name': player.name, 'position': player.position
+                }))
         return True
 
     def msg_handler(self, player, msg):
-        LOG.debug('Msg recved from {} : {}'.format(plyaer, msg))
+        LOG.debug('Msg recved from {} : {}'.format(player, msg))
 
     def remove_player(self, player):
         position = player.position

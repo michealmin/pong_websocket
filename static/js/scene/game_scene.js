@@ -7,6 +7,8 @@ import { Button } from "./button.js";
 class GameScene {
     constructor(url_base) {
         this._player_blocks = Array(2);
+        //ToDo : ui scene 으로 옮길 것
+        this._player_names = Array(2);
         this.ball = null;
         this.edges = Object();
         this._my_position = -1; //invalid
@@ -44,6 +46,20 @@ class GameScene {
         return 'game';
     }
 
+    showPlayer(position, bShow) {
+        this._player_blocks[position].setVisible(bShow);
+        //ToDo: ui scene 으로 옮길 것
+        this._player_names[position].setVisible(bShow);
+    }
+
+    //ToDo: ui scene 으로 옮길 것
+    setPlayerName(position, name) {
+        console.log(position);
+        console.log(name);
+        console.log(this._player_names[position]);
+        this._player_names[position].setText(name);
+    }
+
     getSceneConfig() {
         return {
             key: this.key,
@@ -57,10 +73,7 @@ class GameScene {
         var self = this;
         return function() {
             var this_scene = this;
-            var base_url = self._url_base + 'static/';
-            console.log('base_url');
-            console.log(self._url_base);
-            console.log(base_url);
+            var base_url = self._url_base + '/static/';
             this_scene.load.setBaseURL(base_url);
 
             this_scene.load.spritesheet('button', 'assets/ui/flixel-button.png', {
@@ -80,7 +93,6 @@ class GameScene {
         var self = this;
         return function() {
             var this_scene = this;
-            console.log(this_scene);
             // Create world
             this_scene.add.image(400, 300, 'sky');
 
@@ -111,8 +123,6 @@ class GameScene {
             var screen_size = self.config.screen_size;
             var x = (screen_size.width / 2);
             var y = (screen_size.height / 2);
-            console.log(x);
-            console.log(y);
             self._start_button = new Button(this_scene, 'Start', 'StartText', 300, y, function() {
                 self._on_start_clicked();
             });
@@ -199,7 +209,24 @@ class GameScene {
             block.setDisplaySize(pos_and_size.width, pos_and_size.height);
 
             block.setDebug(true, true, true);
+            block.setVisible(false);
+
+            //ToDo : ui scene 으로 옮길 것
+            var text = this_scene.add.text(pos_and_size.x, pos_and_size.y + 50, "player", {
+                fill: 'rgba(255,255,0,1)',
+                fontSize: 15,
+                fixedWidth: pos_and_size.width,
+                fixedHeight: pos_and_size.height
+            });
+            text.setAlign('center');
+            text.setWordWrapWidth(pos_and_size.height, false);
+            text.setVisible(false);
+
+            this._player_names[i] = text;
+
             this._player_blocks[i] = block;
+
+
         }
     }
 
