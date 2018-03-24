@@ -3,7 +3,7 @@
 import { GameCommon } from "./game_common.js";
 import { GameModel } from "./game_model.js";
 import { GameView } from "./game_view.js";
-import { GameLogic } from "./game_logic.js";
+import { WatingForGameLogic, InGameLogic } from "./game_logic.js";
 
 var game_model = new GameModel();
 
@@ -12,6 +12,7 @@ class GameMain {
         this._url_base = url_base;
         this._ws = null;
         this._msg_queue = Array();
+        this._game_logic = null;
     }
 
     initConnection(url) {
@@ -99,6 +100,16 @@ class GameMain {
             this._msg_queue.push(message);
         } else {
             this._ws.send(message);
+        }
+    }
+
+    changeGameLogic(new_state) {
+        if ("InGame" == new_state) {
+            this._game_logic = new InGameLogic(this, this._game_view);
+        } else if ("WaitingForGame" == new_state) {
+            this._game_logic = new WatingForGameLogic(this, this._game_view)
+        } else {
+            throw ("Invalid game state " + new_state);
         }
     }
 

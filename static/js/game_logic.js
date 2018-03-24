@@ -2,9 +2,68 @@
 
 import { GameConfig } from "./game_config.js";
 
+class GameMsgHandler {
+    consturctor() {
+        this._msg_handlers = Object();
+    }
+
+    _registerMsgHandler(msg_type, handler) {
+        this._msg_handlers[msg_type] = handler;
+    }
+
+    handleMessage(message) {
+        var type = message.type;
+        if (!(type in this._msg_handlers)) {
+            throw ("InGameLogic: Unknow message type " + type);
+        }
+        this._msg_handlers(message);
+    }
+}
+
+class WaitingForGameLogic extends GameMsgHandler {
+    constructor(game_main, game_view) {
+        super();
+        this._state = "WaitingForGame";
+        this.config = GameConfig;
+        this._game_view = game_view;
+
+        this._registerMsgHandler("EnteredRoom", this._onEnteredRoom);
+    }
+
+    _onEnteredRoom() {
+
+    }
+
+
+};
+
 class GameState {
     constructor() {
+        this._round = 0;
         this._score = [0, 0];
+        this._cur_turn = 0;
+    }
+
+    clear() {
+        this._round = 0;
+        this.resetScore();
+        this._cur_turn = 0;
+    }
+
+    get turn() {
+        return _cur_turn;
+    }
+
+    set turn(val) {
+        this._cur_turn = turn;
+    }
+
+    get round() {
+        return this._round;
+    }
+
+    addRound() {
+        ++this.round;
     }
 
     get score() {
@@ -20,9 +79,12 @@ class GameState {
     }
 }
 
-class GameLogic {
-    constructor(game_view) {
+class InGameLogic extends GameMsgHandler {
+    constructor(game_main, game_view) {
+        super();
+        this._state = "InGame";
         this.config = GameConfig;
+        this._game_main = game_main;
         this._game_view = game_view;
         this._game_scene = game_view.game_scene;
         this._game_state = new GameState();
@@ -81,4 +143,4 @@ class GameLogic {
     }
 };
 
-export { GameLogic };
+export { WaitingForGameLogic, InGameLogic };
