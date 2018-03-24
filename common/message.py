@@ -5,16 +5,16 @@ import json
 
 # Cli -> Svr
 class CSMessageTypes:
-    enter_room_req = 'EnterRoomReq'
+    enter_room = 'EnterRoom'
 
 
 # Svr -> Cli
 class SCMessageTypes:
-    enter_room_resp = 'EnterRoomResp'
+    entered_room = 'EnteredRoom'
 
 # Notify
 class ScMessgeNotifyTypes:
-    enter_room_ntf = 'EnterRoomNtf'
+    enter_room_ntf = 'EnteredRoomNtf'
 
 
 def build_notify(msg_type, data):

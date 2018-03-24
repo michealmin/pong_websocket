@@ -17,7 +17,7 @@ def handle_room(socket):
         message = json.loads(socket.receive())
         LOG.debug('handle_room socket opened. message : {}'.format(message))
         if not 'type' in message or\
-            CSMessageTypes.enter_room_req != message['type']:
+            CSMessageTypes.enter_room != message['type']:
             raise errors.ProtocolError(message, 'Invalid enterroomreq')
         room_no = message['room_no']
         player = Player(message['name'], socket)

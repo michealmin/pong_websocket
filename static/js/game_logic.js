@@ -3,11 +3,13 @@
 import { GameConfig } from "./game_config.js";
 
 class GameMsgHandler {
-    consturctor() {
-        this._msg_handlers = Object();
+    constructor(game_main) {
+        this._game_main = game_main;
+        this._msg_handlers = new Map();
     }
 
     _registerMsgHandler(msg_type, handler) {
+        var self = this;
         this._msg_handlers[msg_type] = handler;
     }
 
@@ -16,24 +18,46 @@ class GameMsgHandler {
         if (!(type in this._msg_handlers)) {
             throw ("InGameLogic: Unknow message type " + type);
         }
-        this._msg_handlers(message);
+        console.log('Handle Message.. ' + type);
+        this._msg_handlers[type](message);
     }
 }
 
 class WaitingForGameLogic extends GameMsgHandler {
     constructor(game_main, game_view) {
-        super();
+        super(game_main);
         this._state = "WaitingForGame";
         this.config = GameConfig;
         this._game_view = game_view;
 
-        this._registerMsgHandler("EnteredRoom", this._onEnteredRoom);
-    }
-
-    _onEnteredRoom() {
+        this._registerMsgHandler("EnteredRoom", (msg) => { this._onEnteredRoom(msg); });
+        this._registerMsgHandler("EnteredRoomNtf", (msg) => { this._onEnteredRoomNtf(msg); });
 
     }
 
+    _onEnteredRoom(msg) {
+        console.log('WaitingGame onenteredroom');
+        this._game_view.game_scene.my_position = msg.position;
+        var other_player = msg.other_player;
+        var game_scene = this._game_view.game_scene;
+
+        game_scene.showPlayer(msg.position, true);
+        other_player.forEach(function(elem) {
+            game_scene.setPlayerName(elem.position, elem.name);
+            game_scene.showPlayer(elem.position, true);
+        });
+
+
+    }
+
+    _onEnteredRoomNtf(msg) {
+        console.log('WaitingGame onenteredroomntf');
+        var game_scene = this._game_view.game_scene;
+
+        game_scene.setPlayerName(msg.position, msg.name);
+        game_scene.showPlayer(msg.position, true);
+
+    }
 
 };
 
@@ -81,10 +105,9 @@ class GameState {
 
 class InGameLogic extends GameMsgHandler {
     constructor(game_main, game_view) {
-        super();
+        super(game_main);
         this._state = "InGame";
         this.config = GameConfig;
-        this._game_main = game_main;
         this._game_view = game_view;
         this._game_scene = game_view.game_scene;
         this._game_state = new GameState();
@@ -122,7 +145,6 @@ class InGameLogic extends GameMsgHandler {
         if (!this.isValidPosition(loser_pos)) {
             throw new Error("Invalid player positoin " + player_pos);
         }
-        console.log(this);
         this._game_state.addScore(1 == loser_pos ? 0 : 1);
         if (this.config.match_score <= Math.max(...this._game_state.score)) {
             console.log('Game end');

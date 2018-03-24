@@ -30,7 +30,6 @@ class GameView {
         var scene_config = [this.game_scene.getSceneConfig(),
             this.ui_scene.getSceneConfig()
         ];
-        console.log(scene_config);
         return {
             key: 'game',
             type: Phaser.AUTO,
@@ -63,10 +62,30 @@ class GameView {
         }
     }
 
-    initPhaser(screen_canvas) {
+    isActive() {
+        if (this.game) {
+            var ret = true;
+            this.game.scene.scenes.forEach(function(s) {
+                ret = ret && s.sys.isActive();
+            });
+            return ret;
+        }
+
+        return false;
+    }
+
+    init(screen_canvas) {
+        this.destroyPhaser();
         var game = new Phaser.Game(this.getPhaserConfig(screen_canvas));
         this._phaser_game = game;
-        this._game_scene.my_position = 1;
+        this._game_scene.my_position = 0;
+    }
+
+    destroyPhaser() {
+        if (this._phaser_game) {
+            this._phaser_game.destroy();
+            this._phaser_game = null;
+        }
     }
 };
 

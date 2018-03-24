@@ -8,28 +8,33 @@
     <script type="module">
         import {GameMain} from '/static/js/game_main.js';
 
-        // $(function () {
-        //     var href = windows.location.href;
-        //     var game_main = new GameMain(href);
-        //     game_main.createGame();
-        // });
-
+        var game_main = null;
         function enterRoom(room_no, token, player_name, ) {
             var ori = window.location.origin;
-            var game_main = new GameMain(ori);
-            game_main.createGame();
-            game_main.initConnection('ws://' + window.location.host + '/room/');
-            game_main.enterRoom(room_no, token, player_name);
-            game_main.onEnterRoom = function() {
-                $('div.login-scree').hide();
-                $('div.game-screen').show();
+            if (null === game_main) {
+                game_main = new GameMain(ori);
             }
+
+            game_main.createGame();
+
+            var id = setInterval(()=>{
+                if(game_main.isScenesActive()){
+                game_main.initConnection('ws://' + window.location.host + '/room/');
+                game_main.enterRoom(room_no, token, player_name, ()=>{
+
+                    $('div.login-scree').hide();
+                    $('div.game-screen').show();
+                    });
+                    clearInterval(id);
+
+                }
+            }, 100);
         }
 
 
 
         function login() {
-            console.log('login');
+            console.log('Start login...');
             $.ajax({
                 url: '/lobby/room',
                 type: "POST",

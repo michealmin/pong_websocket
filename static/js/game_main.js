@@ -3,16 +3,32 @@
 import { GameCommon } from "./game_common.js";
 import { GameModel } from "./game_model.js";
 import { GameView } from "./game_view.js";
-import { WatingForGameLogic, InGameLogic } from "./game_logic.js";
+import { WaitingForGameLogic, InGameLogic } from "./game_logic.js";
 
 var game_model = new GameModel();
+
+class Player {
+    constructor(position, name) {
+        this.name = name;
+        this.position = position;
+    }
+}
 
 class GameMain {
     constructor(url_base) {
         this._url_base = url_base;
         this._ws = null;
-        this._msg_queue = Array();
+        clear();
+    }
+
+    clear() {
         this._game_logic = null;
+        this._on_entered_room = null;
+        this._players = new Map();
+    }
+
+    setPlayer(position, name) {
+        this._players[position] = new Player(position, name);
     }
 
     initConnection(url) {
@@ -56,34 +72,13 @@ class GameMain {
         this._msg_queue = Array();
     }
 
+    onEnteredRoom() {
+        this._on_entered_room();
+    }
+
     onSocketMessage(msg) {
-        console.log(msg);
-
-        if (msg.type == "EnterRoomResp") {
-            this.onEnterRoom();
-
-            this._game_view.game_scene.my_position = msg.position;
-            var other_player = msg.other_player;
-            var game_scene = this._game_view.game_scene;
-
-            // ToDo : postBoot 으로 옮길 것
-            setTimeout(function() {
-                    game_scene.showPlayer(msg.position, true);
-                    other_player.forEach(function(elem) {
-                        game_scene.setPlayerName(elem.position, elem.name);
-                        game_scene.showPlayer(elem.position, true);
-                    });
-                },
-                100);
-        } else if (msg.type == "EnterRoomNtf") {
-            var game_scene = this._game_view.game_scene;
-
-            // ToDo : postBoot 으로 옮길 것
-            setTimeout(function() {
-                game_scene.setPlayerName(msg.position, msg.name);
-                game_scene.showPlayer(msg.position, true);
-            }, 100);
-        }
+        console.log("Message Recved" + msg);
+        this._game_logic.handleMessage(msg);
     }
 
     onSocketClose() {
@@ -107,32 +102,35 @@ class GameMain {
         if ("InGame" == new_state) {
             this._game_logic = new InGameLogic(this, this._game_view);
         } else if ("WaitingForGame" == new_state) {
-            this._game_logic = new WatingForGameLogic(this, this._game_view)
+            this._game_logic = new WaitingForGameLogic(this, this._game_view)
         } else {
             throw ("Invalid game state " + new_state);
         }
     }
 
-    enterRoom(room_no, token, player_name) {
+    enterRoom(room_no, token, player_name, on_entered_room) {
         var data = {
-            type: 'EnterRoomReq',
+            type: 'EnterRoom',
             room_no: room_no,
             token: token,
             name: player_name
         }
+        this._on_entered_room = on_entered_room;
         this.sendMessage(JSON.stringify(data));
     }
 
+    isScenesActive() {
+        return this._game_view.isActive();
+    }
+
     createGame() {
+        this.clear();
         var game_view = new GameView(this._url_base);
-
         var game_screen = $('div.game-screen')[0];
-        game_view.initPhaser(game_screen);
-
-        var game_logic = new GameLogic(game_view);
-
+        game_view.init(game_screen);
         this._game_view = game_view;
-        this._game_logic = game_logic;
+
+        this.changeGameLogic("WaitingForGame");
     }
 }
 

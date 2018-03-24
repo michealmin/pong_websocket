@@ -54,9 +54,6 @@ class GameScene {
 
     //ToDo: ui scene 으로 옮길 것
     setPlayerName(position, name) {
-        console.log(position);
-        console.log(name);
-        console.log(this._player_names[position]);
         this._player_names[position].setText(name);
     }
 
@@ -126,6 +123,7 @@ class GameScene {
             self._start_button = new Button(this_scene, 'Start', 'StartText', 300, y, function() {
                 self._on_start_clicked();
             });
+            self._start_button.setVisible(false);
             self.resetRound();
         }
     }
@@ -212,7 +210,7 @@ class GameScene {
             block.setVisible(false);
 
             //ToDo : ui scene 으로 옮길 것
-            var text = this_scene.add.text(pos_and_size.x, pos_and_size.y + 50, "player", {
+            var text = this_scene.add.text(pos_and_size.x, pos_and_size.y + 50, "", {
                 fill: 'rgba(255,255,0,1)',
                 fontSize: 15,
                 fixedWidth: pos_and_size.width,
