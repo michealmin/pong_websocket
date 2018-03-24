@@ -10,16 +10,17 @@ class GameMsgHandler {
 
     _registerMsgHandler(msg_type, handler) {
         var self = this;
-        this._msg_handlers[msg_type] = handler;
+        this._msg_handlers.set(msg_type, handler);
     }
 
     handleMessage(message) {
         var type = message.type;
-        if (!(type in this._msg_handlers)) {
+        var handler = this._msg_handlers.get(type);
+        if (undefined === handler) {
             throw ("InGameLogic: Unknow message type " + type);
         }
         console.log('Handle Message.. ' + type);
-        this._msg_handlers[type](message);
+        handler(message);
     }
 }
 
@@ -37,12 +38,16 @@ class WaitingForGameLogic extends GameMsgHandler {
 
     _onEnteredRoom(msg) {
         console.log('WaitingGame onenteredroom');
-        this._game_view.game_scene.my_position = msg.position;
+        var my_position = msg.position;
         var other_player = msg.other_player;
         var game_scene = this._game_view.game_scene;
 
+        this._game_main.setPlayer(msg.position, msg.name, true);
+        game_scene.setPlayerName(msg.position, msg.name);
         game_scene.showPlayer(msg.position, true);
-        other_player.forEach(function(elem) {
+
+        other_player.forEach((elem) => {
+            this._game_main.setPlayer(msg.position, msg.name, false);
             game_scene.setPlayerName(elem.position, elem.name);
             game_scene.showPlayer(elem.position, true);
         });
@@ -54,9 +59,17 @@ class WaitingForGameLogic extends GameMsgHandler {
         console.log('WaitingGame onenteredroomntf');
         var game_scene = this._game_view.game_scene;
 
+        this._game_main.setPlayer(msg.position, msg.name, false);
         game_scene.setPlayerName(msg.position, msg.name);
         game_scene.showPlayer(msg.position, true);
 
+        console.log(this._game_main.players);
+        console.log(this._game_main.my_position);
+        if (2 <= this._game_main.players.size &&
+            0 == this._game_main.my_position) {
+
+            this._game_view.game_scene.start_button.setVisible(true);
+        }
     }
 
 };

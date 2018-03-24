@@ -18,7 +18,8 @@ class GameMain {
     constructor(url_base) {
         this._url_base = url_base;
         this._ws = null;
-        clear();
+        this._my_position = undefined;
+        this.clear();
     }
 
     clear() {
@@ -27,8 +28,22 @@ class GameMain {
         this._players = new Map();
     }
 
-    setPlayer(position, name) {
-        this._players[position] = new Player(position, name);
+    setPlayer(position, name, is_me) {
+        this._players.set(position, new Player(position, name));
+        console.log(this._players.size);
+        if (is_me) {
+            console.log('add Myself');
+            this._my_position = position;
+            this._game_view.game_scene.my_position = position;
+        }
+    }
+
+    get my_position() {
+        return this._my_position;
+    }
+
+    get players() {
+        return this._players;
     }
 
     initConnection(url) {

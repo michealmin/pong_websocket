@@ -54,6 +54,9 @@ class GameScene {
 
     //ToDo: ui scene 으로 옮길 것
     setPlayerName(position, name) {
+        console.log('setPlayerName');
+        console.log(position);
+        console.log(name);
         this._player_names[position].setText(name);
     }
 
