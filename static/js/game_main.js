@@ -15,10 +15,11 @@ class Player {
 }
 
 class GameMain {
-    constructor(url_base) {
+    constructor(url_base, on_con_closed) {
         this._url_base = url_base;
         this._ws = null;
         this._my_position = undefined;
+        this._on_con_closed = on_con_closed;
         this.clear();
     }
 
@@ -94,11 +95,17 @@ class GameMain {
     }
 
     onSocketClose() {
-
+        if (this._on_con_closed) {
+            this._on_con_closed();
+        }
     }
 
     onSeocketError(evt) {
-
+        console.error('Socket error ');
+        console.error(evt);
+        if (this._on_con_closed) {
+            this._on_con_closed();
+        }
     }
 
     sendMessage(message) {
@@ -139,6 +146,10 @@ class GameMain {
         this.sendMessage(data);
     }
 
+    exitRoom() {
+        this._ws.close();
+    }
+
     isScenesActive() {
         return this._game_view.isActive();
     }
@@ -167,6 +178,10 @@ class GameMain {
     onOpponentLeave(position) {
         this.removePlayer(position);
         this.onEndGame();
+    }
+
+    destroy() {
+        this._game_view.destroyPhaser();
     }
 }
 

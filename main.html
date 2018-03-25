@@ -11,9 +11,17 @@
         var game_main = null;
         function enterRoom(room_no, token, player_name, ) {
             var ori = window.location.origin;
-            if (null === game_main) {
-                game_main = new GameMain(ori);
+            if( null !== game_main) {
+                game_main.destroy();
+                $('div.game-screen canvas').remove();
             }
+
+            game_main = new GameMain(ori, () =>{
+                $('div.login-screen').show();
+                $('div.game-screen').hide();
+                $('div.status p.status').text('Connection closed');
+            });
+
 
             game_main.createGame();
 
@@ -21,8 +29,10 @@
                 if(game_main.isScenesActive()){
                 game_main.initConnection('ws://' + window.location.host + '/room/');
                 game_main.enterRoom(room_no, token, player_name, ()=>{
-
-                    $('div.login-scree').hide();
+                    console.log('EnterRoom!!!!!');
+                    console.log('EnterRoom!!!!!');
+                    console.log('EnterRoom!!!!!');
+                    $('div.login-screen').hide();
                     $('div.game-screen').show();
                     });
                     clearInterval(id);
@@ -31,6 +41,11 @@
             }, 100);
         }
 
+        function exitRoom(){
+            if(null !== game_main) {
+                game_main.exitRoom();
+            }
+        }
 
 
         function login() {
@@ -52,12 +67,16 @@
 
         $(function () {
             $('button#login').click(login);
+            $('button#exit-room').click(exitRoom);
         });
     </script>
 
 </head>
 
 <body>
+    <div class="status">
+        <p class="status"></p>
+    </div>
 
     <div class="login-screen">
         <label for="player-name">이름</label>
@@ -65,7 +84,9 @@
         <button id="login">로그인</button>
     </div>
 
-    <div class="game-screen ">
+    <div class="game-screen" style="display:None;">
+        <button id="exit-room">나가기</button>
+
     </div>
 </body>
 

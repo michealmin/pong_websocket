@@ -32,7 +32,7 @@ class GameView {
         ];
         return {
             key: 'game',
-            type: Phaser.AUTO,
+            type: Phaser.CANVAS,
             parent: screen_parent,
             width: screen_size.width,
             height: screen_size.height,
@@ -43,10 +43,10 @@ class GameView {
                     gravity: {
                         y: 0
                     },
-                    debugShowBody: true
+                    debugShowBody: false
                 }
             },
-            debug: true,
+            debug: false,
             scene: scene_config,
             callbacks: {
                 postBoot: this.postBoot

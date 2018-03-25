@@ -77,6 +77,8 @@ class WaitingForGameLogic extends GameMsgHandler {
             game_scene.setPlayerName(elem.position, elem.name);
             game_scene.showPlayer(elem.position, true);
         });
+
+        this._game_main._on_entered_room();
         this.checkAndShowStartBtn();
     }
 
