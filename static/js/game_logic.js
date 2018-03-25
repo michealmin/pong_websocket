@@ -19,7 +19,6 @@ class GameMsgHandler {
         if (undefined === handler) {
             throw ("InGameLogic: Unknow message type " + type);
         }
-        console.log('Handle Message.. ' + type);
         handler(message);
     }
 }
@@ -95,21 +94,11 @@ class GameState {
     constructor() {
         this._round = 0;
         this._score = [0, 0];
-        this._cur_turn_pos = 0;
     }
 
     clear() {
         this._round = 0;
         this.resetScore();
-        this._cur_turn_pos = 0;
-    }
-
-    get turn_pos() {
-        return _cur_turn_pos;
-    }
-
-    set turn_pos(val) {
-        this._cur_turn_pos = turn;
     }
 
     get round() {
@@ -151,7 +140,11 @@ class InGameLogic extends GameMsgHandler {
         this._last_my_block_pos_x = -100;
         this._registerMsgHandler("BlockPosNtf", (msg) => {
             this._onBlockPosNtf(msg);
-        })
+        });
+
+        this._registerMsgHandler("BallBlockCollideNtf", (msg) => {
+            this._onBallBlockCollideNtf(msg);
+        });
     }
 
     isValidPosition(position) {
@@ -164,9 +157,7 @@ class InGameLogic extends GameMsgHandler {
         this._game_scene.startRound();
 
         this._game_scene.on_block_pos_sync_timer = (x) => {
-            console.log(1 < Math.abs(this._last_my_block_pos_x - x));
             if (1 < Math.abs(this._last_my_block_pos_x - x)) {
-                console.log('blocksyncsend 2');
                 this._game_main.sendMessage({
                     type: 'SyncBlockPos',
                     x: x
@@ -174,6 +165,15 @@ class InGameLogic extends GameMsgHandler {
                 this._last_my_block_pos_x = x;
             };
         }
+
+        this._game_scene.on_my_block_and_ball_collide =
+            (ball_x, ball_y, block_x) => {
+                this._game_main.sendMessage({
+                    type: 'SyncBallBlockCollide',
+                    ball_pos: [ball_x, ball_y],
+                    block_x: block_x
+                })
+            };
     }
 
     onRoundStarted() {
@@ -204,6 +204,8 @@ class InGameLogic extends GameMsgHandler {
 
     processEndGame() {
         //ToDo : 승자 표시, 혹은 결과 표시
+        this._game_scene.on_block_pos_sync_timer = (x) => {};
+        this._game_scene.on_my_block_and_ball_collide = () => {};
         this._game_scene.resetGame();
         this._game_scene.start_button.setVisible(true);
     }
@@ -214,9 +216,19 @@ class InGameLogic extends GameMsgHandler {
 
     //message handlers
     _onBlockPosNtf(msg) {
-        console.log('OnBlockPosNtf');
-        console.log(msg);
         this._game_scene.setPlayerBlockPos(msg.position, msg.x);
+    }
+
+    _onBallBlockCollideNtf(msg) {
+        console.log('onBallAndBlockCollide recved');
+        console.log('onBallAndBlockCollide recved');
+        console.log('onBallAndBlockCollide recved');
+        console.log('onBallAndBlockCollide recved');
+        console.log('onBallAndBlockCollide recved');
+        console.log('onBallAndBlockCollide recved');
+        console.log(msg);
+        this._game_scene.setPlayerBlockPos(msg.position, msg.block_x);
+        this._game_scene.setBallPos(msg.ball_pos[0], msg.ball_pos[1]);
     }
 };
 

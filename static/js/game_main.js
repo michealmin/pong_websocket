@@ -60,8 +60,6 @@ class GameMain {
         }
 
         this._ws.onmessage = function(evt) {
-            console.log('receved ' + evt);
-            console.log(evt.data);
             try {
                 self.onSocketMessage(JSON.parse(evt.data));
             } catch (e) {
@@ -88,7 +86,6 @@ class GameMain {
     }
 
     onSocketMessage(msg) {
-        console.log("Message Recved" + msg);
         this._game_logic.handleMessage(msg);
     }
 

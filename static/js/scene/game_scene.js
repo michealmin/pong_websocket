@@ -9,7 +9,7 @@ class GameScene {
         this._player_blocks = Array(2);
         //ToDo : ui scene 으로 옮길 것
         this._player_names = Array(2);
-        this.ball = null;
+        this._ball = null;
         this.edges = Object();
         this._my_position = -1; //invalid
         this._url_base = url_base;
@@ -23,6 +23,7 @@ class GameScene {
 
         this._update_block_pos_evt = undefined;
         this._on_update_block_pos = () => {};
+        this._on_my_block_and_ball_collide = () => {};
 
         this._in_round = false;
     }
@@ -55,6 +56,14 @@ class GameScene {
         }
     }
 
+    set on_my_block_and_ball_collide(func) {
+        if (func) {
+            this._on_my_block_and_ball_collide = func;
+        } else {
+            this._on_my_block_and_ball_collide = () => {};
+        }
+    }
+
     get start_button() {
         return this._start_button;
     }
@@ -77,8 +86,20 @@ class GameScene {
         }
     }
 
+    onPlayerBlockAndBallCollide(ball, block, pos) {
+        if (this._my_position == pos) {
+            this._on_my_block_and_ball_collide(ball.x, ball.y, block.x);
+        }
+    }
+
     setPlayerBlockPos(position, x) {
-        this._player_blocks[position].setX(x);
+        var block = this._player_blocks[position];
+        block.setX(x);
+    }
+
+    setBallPos(x, y) {
+        this._ball.setX(x);
+        this._ball.setY(y);
     }
 
     //ToDo: ui scene 으로 옮길 것
@@ -133,9 +154,6 @@ class GameScene {
             self.initOverlap(this_scene);
 
             self.cursors = this_scene.input.keyboard.createCursorKeys();
-            console.log('Time!!');
-            console.log(this_scene.time);
-
 
             //Ui Scene 으로 옯길 것들
             // var score = [0, 0];
@@ -192,7 +210,7 @@ class GameScene {
 
     resetGame() {
         this.resetRound();
-        this.ball.setMaxVelocity(100, 800);
+        this._ball.setMaxVelocity(100, 800);
         this._in_round = false;
         var block_pos_and_size = this.config.player_block_pos_size;
         for (var i = 0; i < block_pos_and_size.length; ++i) {
@@ -204,19 +222,19 @@ class GameScene {
 
     resetRound() {
         var screen_size = this.config.screen_size;
-        this.ball.setVelocity(0, 0);
-        this.ball.setBounce(0.5, 1.05);
-        this.ball.setPosition(screen_size.width / 2, screen_size.height / 2);
-        this.ball.setVisible(false);
-        this.ball_emitter.setVisible(false);
+        this._ball.setVelocity(0, 0);
+        this._ball.setBounce(0.5, 1.05);
+        this._ball.setPosition(screen_size.width / 2, screen_size.height / 2);
+        this._ball.setVisible(false);
+        this._ball_emitter.setVisible(false);
         this._in_round = false;
     }
 
     startRound() {
         this.resetRound();
-        this.ball.setVelocity(200, 200);
-        this.ball.setVisible(true);
-        this.ball_emitter.setVisible(true);
+        this._ball.setVelocity(200, 200);
+        this._ball.setVisible(true);
+        this._ball_emitter.setVisible(true);
         this._in_round = true;
     }
 
@@ -240,8 +258,8 @@ class GameScene {
         ball.body.enable = true;
         emitter.startFollow(ball);
 
-        this.ball = ball;
-        this.ball_emitter = emitter;
+        this._ball = ball;
+        this._ball_emitter = emitter;
     }
 
     createPlayerBlocks(this_scene) {
@@ -298,9 +316,13 @@ class GameScene {
     }
 
     initCollider(this_scene) {
-        var ball = this.ball;
-        this._player_blocks.forEach(function(block) {
-            this_scene.physics.add.collider(ball, block);
+        var ball = this._ball;
+        var self = this;
+        this._player_blocks.forEach(function(block, pos) {
+            this_scene.physics.add.collider(ball, block,
+                (ball, block) => { self.onPlayerBlockAndBallCollide(ball, block, pos); },
+                null, null
+            );
         });
         this_scene.physics.add.collider(ball, this.edges.left);
         this_scene.physics.add.collider(ball, this.edges.right);
@@ -308,13 +330,13 @@ class GameScene {
 
     initOverlap(this_scene) {
         var self = this;
-        this_scene.physics.add.overlap(this.ball, this.edges.top, function() {
+        this_scene.physics.add.overlap(this._ball, this.edges.top, function() {
             // player positon 은 아랫쪽이 0
             self._on_edge_overlapped(1);
 
 
         });
-        this_scene.physics.add.overlap(this.ball, this.edges.bottom, function() {
+        this_scene.physics.add.overlap(this._ball, this.edges.bottom, function() {
             // player positon 은 아랫쪽이 0
             self._on_edge_overlapped(0);
         });

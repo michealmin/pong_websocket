@@ -13,6 +13,7 @@ class CSMessageTypes:
     enter_room = 'EnterRoom'
     start_game = 'StartGame'
     sync_block_pos = 'SyncBlockPos'
+    ball_block_collide = 'SyncBallBlockCollide'
 
 
 # Svr -> Cli
@@ -23,6 +24,7 @@ class SCMessageTypes:
     enter_room_ntf = 'EnteredRoomNtf'
     start_game_ntf = 'StartGameNtf'
     block_pos_ntf = 'BlockPosNtf'
+    ball_block_collide_ntf = 'BallBlockCollideNtf'
 
 
 def build_notify(msg_type, data):

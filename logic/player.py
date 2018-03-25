@@ -49,7 +49,7 @@ class Player:
         info = {
             'name': self._name,
             'position': self._position,
-            'room': str(self._room)
+            'room': self._room.room_no
         }
 
         return json.dumps(info)
