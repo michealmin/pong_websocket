@@ -33,6 +33,38 @@ class GameConfig {
         return block_pos_and_size;
     }
 
+    static get scoreboard_pos() {
+        return [{
+                name: {
+                    x: 50,
+                    y: 350,
+                    width: 100,
+                    height: 40
+                },
+                score: {
+                    x: 50,
+                    y: 380,
+                    width: 100,
+                    height: 40
+                }
+            },
+            {
+                name: {
+                    x: 50,
+                    y: 250,
+                    width: 100,
+                    height: 40
+                },
+                score: {
+                    x: 50,
+                    y: 235,
+                    width: 100,
+                    height: 40
+                }
+            }
+        ];
+    }
+
     static get edge_pos_size() {
         var screen_size = GameConfig.screen_size;
         var thickness = 10;

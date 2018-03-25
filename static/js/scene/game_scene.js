@@ -9,6 +9,7 @@ class GameScene {
         this._player_blocks = Array(2);
         //ToDo : ui scene 으로 옮길 것
         this._player_names = Array(2);
+        this._player_scores = Array(2);
         this._ball = null;
         this.edges = Object();
         this._my_position = -1; //invalid
@@ -72,10 +73,9 @@ class GameScene {
         return 'game';
     }
 
-    showPlayer(position, bShow) {
-        this._player_blocks[position].setVisible(bShow);
-        //ToDo: ui scene 으로 옮길 것
-        this._player_names[position].setVisible(bShow);
+    showPlayer(position, val) {
+        this._player_blocks[position].setVisible(val);
+        this._player_names[position].setVisible(val);
     }
 
     onBlockPosSync() {
@@ -105,6 +105,17 @@ class GameScene {
     //ToDo: ui scene 으로 옮길 것
     setPlayerName(position, name) {
         this._player_names[position].setText(name);
+    }
+
+    setScoreVisible(val) {
+        this._player_scores.forEach((e) => {
+            e.setVisible(val);
+        });
+    }
+
+    setScores(score_info) {
+        this._player_scores[0].setText(score_info[0].toString());
+        this._player_scores[1].setText(score_info[1].toString());
     }
 
     getSceneConfig() {
@@ -148,6 +159,7 @@ class GameScene {
 
             self.createBall(this_scene);
             self.createPlayerBlocks(this_scene);
+            self.createScoreBoard(this_scene);
             self.createEdges(this_scene);
 
             self.initCollider(this_scene);
@@ -155,16 +167,6 @@ class GameScene {
 
             self.cursors = this_scene.input.keyboard.createCursorKeys();
 
-            //Ui Scene 으로 옯길 것들
-            // var score = [0, 0];
-            // objects.scoreboard.push(this_scene.add.text(10, 10, score[0].toString()));
-            // objects.scoreboard.push(this_scene.add.text(10, 590, score[1].toString()));
-
-            // var input_for_gameobject_handlers = {};
-
-            // function registerInputForGameObject(go, handlers) {
-            //     input_for_gameobject_handlers[go.key] = handlers;
-            // }
             var screen_size = self.config.screen_size;
             var x = (screen_size.width / 2);
             var y = (screen_size.height / 2);
@@ -194,10 +196,10 @@ class GameScene {
                 var player_block = self._player_blocks[self._my_position];
                 if (player_block) {
                     if (self.cursors.left.isDown) {
-                        player_block.setVelocityX(-250);
+                        player_block.setVelocityX(-350);
 
                     } else if (self.cursors.right.isDown) {
-                        player_block.setVelocityX(250);
+                        player_block.setVelocityX(350);
 
                     } else {
                         player_block.setVelocityX(0);
@@ -277,21 +279,36 @@ class GameScene {
             block.setDebug(true, true, true);
             block.setVisible(false);
 
-            //ToDo : ui scene 으로 옮길 것
-            var text = this_scene.add.text(pos_and_size.x, pos_and_size.y + 50, "", {
-                fill: 'rgba(255,255,0,1)',
-                fontSize: 15,
-                fixedWidth: pos_and_size.width,
-                fixedHeight: pos_and_size.height
-            });
-            text.setAlign('center');
-            text.setWordWrapWidth(pos_and_size.height, false);
-            text.setVisible(false);
-
-            this._player_names[i] = text;
-
             this._player_blocks[i] = block;
 
+
+        }
+    }
+
+    createScoreBoard(this_scene) {
+        var board_pos_and_size = this.config.scoreboard_pos;
+        for (var i = 0; i < board_pos_and_size.length; ++i) {
+            var pos_and_size = board_pos_and_size[i].name;
+            var name_text = this_scene.add.text(pos_and_size.x, pos_and_size.y, "player", { fontFamily: "Arial Black", fontSize: 25, color: "#660066" });
+            name_text.setAlign('center');
+            name_text.setWordWrapWidth(pos_and_size.height, false);
+            name_text.setVisible(false);
+
+            this._player_names[i] = name_text;
+
+            var pos_and_size = board_pos_and_size[i].score;
+            var score_text = this_scene.add.text(pos_and_size.x, pos_and_size.y, "0", {
+                fontSize: 15,
+                fontFamily: 'Arial',
+                color: '#009900'
+                    // fixedWidth: pos_and_size.width,
+                    // fixedHeight: pos_and_size.height
+            });
+            score_text.setAlign('center');
+            score_text.setWordWrapWidth(pos_and_size.height, false);
+            score_text.setVisible(true);
+
+            this._player_scores[i] = score_text;
 
         }
     }

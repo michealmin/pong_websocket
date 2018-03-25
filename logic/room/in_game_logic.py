@@ -107,11 +107,15 @@ class InGameLogic(MsgHandlerBase):
 
         self._game_state.update_score(loser_pos)
 
-
         winner = None
         if self._game_state.is_game_end():
             winner = self._game_state.get_winner()
         score_info = self._game_state.scores
+
+        if None is not winner:
+            LOG.debug('Game end')
+            self._on_game_end()
+
 
         self._room.broadcast(
             build_notify(
@@ -123,6 +127,4 @@ class InGameLogic(MsgHandlerBase):
             )
         )
 
-        if winner:
-            self._on_game_end()
 

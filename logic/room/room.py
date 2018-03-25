@@ -88,7 +88,7 @@ class Room(MsgHandlerBase):
         if self._in_game_logic.is_in_game:
             return self._in_game_logic.handle_message(player, msg)
         else:
-            self._msg_handlers[ msg[MsgReservedField.type_field]](player, msg)
+            self._msg_handlers[msg[MsgReservedField.type_field]](player, msg)
 
     def broadcast(self, msg, except_player=None):
         for pos, player in self._players.items():

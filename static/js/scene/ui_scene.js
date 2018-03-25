@@ -5,11 +5,6 @@ import { Button } from "./button.js";
 class UIScene {
     constructor(url_base) {
         this._url_base = url_base;
-        this._on_start_clicked = undefined;
-    }
-
-    set on_start_clicked(func) {
-        this._on_start_clicked = func;
     }
 
     get key() {
@@ -19,37 +14,41 @@ class UIScene {
     getSceneConfig() {
         return {
             key: this.key,
-            // preload: this.preload,
             create: this.create
         }
     }
 
-    showStausText(text) {
-
+    showStatusText(val) {
+        this._center_text.setVisible(val);
     }
 
-    get preload() {
-        var self = this;
-        return function() {
-            var this_scene = this;
-
-            var base_url = self._url_base + '/static/';
-            this_scene.load.setBaseURL(base_url);
-            this_scene.load.spritesheet('button', 'assets/ui/flixel-button.png', {
-                frameWidth: 80,
-                frameHeight: 20
-            });
-            console.log(this_scene);
-            this_scene.load.bitmapFont('hyperdrive', 'assets/fonts/bitmap/hyperdrive.png', 'assets/fonts/bitmap/hyperdrive.xml');
+    setStausText(text) {
+            this._center_text.setText(text);
         }
-    }
+        /*
+            get preload() {
+                var self = this;
+                return function() {
+                    var this_scene = this;
 
+                    var base_url = self._url_base + '/static/';
+                    this_scene.load.setBaseURL(base_url);
+                    this_scene.load.spritesheet('button', 'assets/ui/flixel-button.png', {
+                        frameWidth: 80,
+                        frameHeight: 20
+                    });
+                    console.log(this_scene);
+                    this_scene.load.bitmapFont('hyperdrive', 'assets/fonts/bitmap/hyperdrive.png', 'assets/fonts/bitmap/hyperdrive.xml');
+                }
+            }
+        */
     get create() {
         var self = this;
         return function() {
             var this_scene = this;
-            var text = this_scene.add.text(100, 300, "", {
+            var text = this_scene.add.text(150, 150, "", {
                 fill: 'rgba(0,255,0,1)',
+                color: '#000066',
                 fontSize: 40,
                 fixedWidth: 400,
                 fixedHeight: 100
@@ -57,17 +56,12 @@ class UIScene {
 
             text.setAlign('center');
             text.setWordWrapWidth('400', false);
-            this.center_text = text;
+            text.setVisible(true);
+            self._center_text = text;
 
-            // self._start_button = new Button(this_scene, 'Start', 'StartText', 200, 200, function() {
-            //     self._on_start_clicked();
-            // });
         }
     }
 
-    setCenterText(text) {
-        this.center_text.setText(text);
-    }
 };
 
 export { UIScene };

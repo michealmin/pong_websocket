@@ -44,6 +44,17 @@ class WaitingForGameLogic extends GameMsgHandler {
         });
     }
 
+    checkAndShowStartBtn() {
+        console.log('checkStartBtn');
+        console.log(this._game_main.my_position);
+        console.log
+        if (2 <= this._game_main.players.size &&
+            0 == this._game_main.my_position) {
+
+            this._game_view.game_scene.start_button.setVisible(true);
+        }
+    }
+
     _onStartGameNtf() {
         this._game_main.startGame();
     }
@@ -59,12 +70,11 @@ class WaitingForGameLogic extends GameMsgHandler {
         game_scene.showPlayer(msg.position, true);
 
         other_player.forEach((elem) => {
-            this._game_main.setPlayer(msg.position, msg.name, false);
+            this._game_main.setPlayer(elem.position, elem.name, false);
             game_scene.setPlayerName(elem.position, elem.name);
             game_scene.showPlayer(elem.position, true);
         });
-
-
+        checkAndShowStartBtn();
     }
 
     _onEnteredRoomNtf(msg) {
@@ -75,17 +85,8 @@ class WaitingForGameLogic extends GameMsgHandler {
         game_scene.setPlayerName(msg.position, msg.name);
         game_scene.showPlayer(msg.position, true);
 
-        this.checkAndStartGame();
+        this.checkAndShowStartBtn();
 
-    }
-
-    //
-    checkAndStartGame() {
-        if (2 <= this._game_main.players.size &&
-            0 == this._game_main.my_position) {
-
-            this._game_view.game_scene.start_button.setVisible(true);
-        }
     }
 
 };
@@ -93,36 +94,28 @@ class WaitingForGameLogic extends GameMsgHandler {
 class GameState {
     constructor() {
         this._round = 0;
-        this._score = [0, 0];
+        this._scores = [0, 0];
     }
 
     clear() {
         this._round = 0;
-        this.resetScore();
+        this.resetScores();
     }
 
-    get round() {
-        return this._round;
+    get scores() {
+        return this._scores
     }
 
-    addRound() {
-        ++this.round;
+    set scores(val) {
+        this._scores = val;
     }
 
-    get score() {
-        return this._score
+    resetScores() {
+        this._scores = [0, 0];
     }
 
-    set score(val) {
-        this._score = val;
-    }
-
-    resetScore() {
-        this._score = [0, 0];
-    }
-
-    setScore(score) {
-        this._score = score;
+    setScores(score) {
+        this._scores = score;
     }
 }
 
@@ -133,17 +126,20 @@ class InGameLogic extends GameMsgHandler {
         this.config = GameConfig;
         this._game_view = game_view;
         this._game_scene = game_view.game_scene;
+        this._ui_scene = game_view.ui_scene;
         this._game_state = new GameState();
+        this._in_round = false;
 
         var self = this;
         this._game_scene.on_edge_overlapped = (loser_pos) => {
-            if (loser_pos == this._game_main.my_position) {
+
+            if (this._in_round && loser_pos == this._game_main.my_position) {
                 this._game_main.sendMessage({
                     type: 'RoundEnd',
                     loser_pos: loser_pos
                 })
             }
-
+            this._in_round = false;
         }
 
         this._last_my_block_pos_x = -100;
@@ -166,7 +162,11 @@ class InGameLogic extends GameMsgHandler {
 
     startGame() {
         this.resetGame();
-        this.onRoundStarted();
+        this.onGameStarted();
+        this._ui_scene.showStatusText(false);
+        this._game_scene.setScores(this._game_state.scores);
+
+        this._in_round = true;
         this._game_scene.startRound();
 
         this._game_scene.on_block_pos_sync_timer = (x) => {
@@ -189,12 +189,13 @@ class InGameLogic extends GameMsgHandler {
             };
     }
 
-    onRoundStarted() {
+    onGameStarted() {
+
         this._game_scene.start_button.setVisible(false);
     }
 
     startNextRound() {
-        this.onRoundStarted();
+        this._in_round = true;
         this._game_scene.startRound();
 
 
@@ -212,11 +213,10 @@ class InGameLogic extends GameMsgHandler {
         this._game_scene.on_block_pos_sync_timer = (x) => {};
         this._game_scene.on_my_block_and_ball_collide = () => {};
         this._game_scene.resetGame();
-        this._game_scene.start_button.setVisible(true);
     }
 
     resetGame() {
-        this._game_state.resetScore();
+        this._game_state.resetScores();
     }
 
     //message handlers
@@ -231,19 +231,18 @@ class InGameLogic extends GameMsgHandler {
 
     _onRoundEndNtf(msg) {
         var is_game_end = msg.winner !== undefined && msg.winner !== null;
-        console.log('RoundEndNtf');
-        console.log(msg);
-        console.log(is_game_end);
+
+        this._game_state.setScores(msg.score_info);
+        this._game_scene.setScores(this._game_state.scores);
+
         if (is_game_end) {
-            //ToDo : 결과창 표시 
+            this.processEndGame();
+            var result_text = this._game_main.players.get(msg.winner).name + " Wins!";
+            console.log(result_text);
+            this._ui_scene.setStausText(result_text);
+            this._ui_scene.showStatusText(true);
             this._game_main.endGame();
         } else {
-            // ToDo 점수판 표시
-            //round end. start next round
-            console.log('Start Next round');
-            console.log(msg.score_info);
-            this._game_state.setScore(msg.score_info);
-
             this.startNextRound(msg.score_info);
         }
     }

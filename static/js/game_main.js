@@ -30,11 +30,11 @@ class GameMain {
 
     setPlayer(position, name, is_me) {
         this._players.set(position, new Player(position, name));
-        console.log(this._players.size);
         if (is_me) {
             console.log('add Myself');
             this._my_position = position;
             this._game_view.game_scene.my_position = position;
+            console.log(this._my_position);
         }
     }
 
@@ -154,7 +154,9 @@ class GameMain {
         this._game_logic.startGame()
     }
     endGame() {
+
         this.changeGameLogic("WaitingForGame");
+        this._game_logic.checkAndShowStartBtn();
     }
 }
 
