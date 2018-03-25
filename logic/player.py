@@ -35,11 +35,14 @@ class Player:
     def send_msg(self, msg):
         self._ws.send(msg)
 
-    def on_message(self, msg):
-        return self._handle_msg(self, msg)
 
     def set_msg_handler(self, handler):
         self._handle_msg = handler
+        
+    def process_message(self, msg):
+        if None is self._handle_msg:
+            raise ValueError('handle_msg is not set')
+        self._handle_msg(self, msg)
 
     def __str__(self):
         info = {

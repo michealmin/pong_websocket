@@ -5,9 +5,7 @@ import { Button } from "./button.js";
 class UIScene {
     constructor(url_base) {
         this._url_base = url_base;
-        this._on_start_clicked = function() {
-
-        }
+        this._on_start_clicked = undefined;
     }
 
     set on_start_clicked(func) {

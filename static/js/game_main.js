@@ -87,10 +87,6 @@ class GameMain {
         this._msg_queue = Array();
     }
 
-    onEnteredRoom() {
-        this._on_entered_room();
-    }
-
     onSocketMessage(msg) {
         console.log("Message Recved" + msg);
         this._game_logic.handleMessage(msg);
@@ -106,10 +102,15 @@ class GameMain {
 
     sendMessage(message) {
         var sock_state = this._ws.readyState;
+        var msg = message;
+        if (typeof message == "object") {
+            msg = JSON.stringify(message);
+        }
+
         if (0 == sock_state) {
-            this._msg_queue.push(message);
+            this._msg_queue.push(msg);
         } else {
-            this._ws.send(message);
+            this._ws.send(msg);
         }
     }
 
@@ -131,7 +132,7 @@ class GameMain {
             name: player_name
         }
         this._on_entered_room = on_entered_room;
-        this.sendMessage(JSON.stringify(data));
+        this.sendMessage(data);
     }
 
     isScenesActive() {
@@ -146,6 +147,11 @@ class GameMain {
         this._game_view = game_view;
 
         this.changeGameLogic("WaitingForGame");
+    }
+
+    startGame() {
+        this.changeGameLogic("InGame");
+        this._game_logic.startGame()
     }
 }
 

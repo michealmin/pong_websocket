@@ -19,7 +19,7 @@ class GameScene {
             console.log('overlapped ' + player_position);
         }
 
-        this._on_start_clicked = function() {}
+        this._on_start_clicked = undefined;
     }
 
     get config() {

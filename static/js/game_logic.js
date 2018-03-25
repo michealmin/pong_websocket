@@ -31,9 +31,22 @@ class WaitingForGameLogic extends GameMsgHandler {
         this.config = GameConfig;
         this._game_view = game_view;
 
+        this._game_view._game_scene.on_start_clicked = () => { this.startGame(); }
+
         this._registerMsgHandler("EnteredRoom", (msg) => { this._onEnteredRoom(msg); });
         this._registerMsgHandler("EnteredRoomNtf", (msg) => { this._onEnteredRoomNtf(msg); });
+        this._registerMsgHandler("StartGameNtf", (msg) => { this._onStartGameNtf(msg); });
 
+    }
+
+    startGame() {
+        this._game_main.sendMessage({
+            type: 'StartGame'
+        });
+    }
+
+    _onStartGameNtf() {
+        this._game_main.startGame();
     }
 
     _onEnteredRoom(msg) {
@@ -63,8 +76,12 @@ class WaitingForGameLogic extends GameMsgHandler {
         game_scene.setPlayerName(msg.position, msg.name);
         game_scene.showPlayer(msg.position, true);
 
-        console.log(this._game_main.players);
-        console.log(this._game_main.my_position);
+        this.checkAndStartGame();
+
+    }
+
+    //
+    checkAndStartGame() {
         if (2 <= this._game_main.players.size &&
             0 == this._game_main.my_position) {
 
@@ -78,21 +95,21 @@ class GameState {
     constructor() {
         this._round = 0;
         this._score = [0, 0];
-        this._cur_turn = 0;
+        this._cur_turn_pos = 0;
     }
 
     clear() {
         this._round = 0;
         this.resetScore();
-        this._cur_turn = 0;
+        this._cur_turn_pos = 0;
     }
 
-    get turn() {
-        return _cur_turn;
+    get turn_pos() {
+        return _cur_turn_pos;
     }
 
-    set turn(val) {
-        this._cur_turn = turn;
+    set turn_pos(val) {
+        this._cur_turn_pos = turn;
     }
 
     get round() {
@@ -130,16 +147,16 @@ class InGameLogic extends GameMsgHandler {
         this._game_scene.on_edge_overlapped = function(loser_pos) {
             self.onRoundFinished(loser_pos);
         }
-
-        this._game_scene.on_start_clicked = function() {
-            self.resetGame();
-            self.onRoundStarted();
-            self._game_scene.startRound();
-        }
     }
 
     isValidPosition(position) {
         return (0 <= position && position <= 1);
+    }
+
+    startGame() {
+        this.resetGame();
+        this.onRoundStarted();
+        this._game_scene.startRound();
     }
 
     onRoundStarted() {
