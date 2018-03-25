@@ -38,6 +38,10 @@ class GameMain {
         }
     }
 
+    removePlayer(position) {
+        this._players.delete(position);
+    }
+
     get my_position() {
         return this._my_position;
     }
@@ -153,10 +157,16 @@ class GameMain {
         this.changeGameLogic("InGame");
         this._game_logic.startGame()
     }
-    endGame() {
+
+    onEndGame() {
 
         this.changeGameLogic("WaitingForGame");
         this._game_logic.checkAndShowStartBtn();
+    }
+
+    onOpponentLeave(position) {
+        this.removePlayer(position);
+        this.onEndGame();
     }
 }
 

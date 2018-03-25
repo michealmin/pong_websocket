@@ -30,6 +30,8 @@ class SCMessageTypes:
 
     round_end_ntf = 'RoundEndNtf'
 
+    player_leave_ntf = 'PlayerLeaveNtf'
+
 
 def build_notify(msg_type, data):
     ret = copy.deepcopy(data)

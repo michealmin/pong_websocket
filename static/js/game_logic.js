@@ -35,7 +35,7 @@ class WaitingForGameLogic extends GameMsgHandler {
         this._registerMsgHandler("EnteredRoom", (msg) => { this._onEnteredRoom(msg); });
         this._registerMsgHandler("EnteredRoomNtf", (msg) => { this._onEnteredRoomNtf(msg); });
         this._registerMsgHandler("StartGameNtf", (msg) => { this._onStartGameNtf(msg); });
-
+        this._registerMsgHandler("PlayerLeaveNtf", (msg) => { this._onPlayerLeaveNtf(msg); });
     }
 
     startGame() {
@@ -45,13 +45,16 @@ class WaitingForGameLogic extends GameMsgHandler {
     }
 
     checkAndShowStartBtn() {
-        console.log('checkStartBtn');
-        console.log(this._game_main.my_position);
-        console.log
+        console.log('checkAndShowStartBtn');
+        console.log(2 <= this._game_main.players.size &&
+            0 == this._game_main.my_position);
+
         if (2 <= this._game_main.players.size &&
             0 == this._game_main.my_position) {
 
             this._game_view.game_scene.start_button.setVisible(true);
+        } else {
+            this._game_view.game_scene.start_button.setVisible(false);
         }
     }
 
@@ -74,7 +77,7 @@ class WaitingForGameLogic extends GameMsgHandler {
             game_scene.setPlayerName(elem.position, elem.name);
             game_scene.showPlayer(elem.position, true);
         });
-        checkAndShowStartBtn();
+        this.checkAndShowStartBtn();
     }
 
     _onEnteredRoomNtf(msg) {
@@ -86,7 +89,16 @@ class WaitingForGameLogic extends GameMsgHandler {
         game_scene.showPlayer(msg.position, true);
 
         this.checkAndShowStartBtn();
+    }
 
+    _onPlayerLeaveNtf(msg) {
+        var game_scene = this._game_view.game_scene;
+
+
+        game_scene.setPlayerName(msg.position, "");
+        game_scene.showPlayer(msg.position, false);
+
+        this._game_main.onOpponentLeave(msg.position);
     }
 
 };
@@ -153,6 +165,9 @@ class InGameLogic extends GameMsgHandler {
 
         this._registerMsgHandler("RoundEndNtf", (msg) => {
             this._onRoundEndNtf(msg);
+        });
+        this._registerMsgHandler("PlayerLeaveNtf", (msg) => {
+            this._onPlayerLeaveNtf(msg);
         });
     }
 
@@ -238,13 +253,22 @@ class InGameLogic extends GameMsgHandler {
         if (is_game_end) {
             this.processEndGame();
             var result_text = this._game_main.players.get(msg.winner).name + " Wins!";
-            console.log(result_text);
             this._ui_scene.setStausText(result_text);
             this._ui_scene.showStatusText(true);
-            this._game_main.endGame();
+            this._game_main.onEndGame();
         } else {
             this.startNextRound(msg.score_info);
         }
+    }
+
+    _onPlayerLeaveNtf(msg) {
+        this.processEndGame();
+        var game_scene = this._game_view.game_scene;
+
+        game_scene.setPlayerName(msg.position, "");
+        game_scene.showPlayer(msg.position, false);
+        this._game_main.onOpponentLeave(msg.position);
+
     }
 };
 

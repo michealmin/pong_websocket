@@ -43,7 +43,8 @@ def handle_room(socket):
         try:
             player.exit_room()
             socket.close()
-        except:
+        except Exception as e:
+            LOG.info('exit room error {}'.format(e))
             pass
 
         return str(e)

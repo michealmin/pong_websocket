@@ -64,17 +64,26 @@ class Room(MsgHandlerBase):
         return True
 
     def remove_player(self, player):
+        LOG.debug('Remoe player {} from {}'.format(player, self))
         position = player.position
         if None is self._players[position]\
             or self._players[player.position] is not player:
+            LOG.debug('Error on removeplayer')
             raise RoomError(
                 self,
                 'Removeplayer err. Cannot find player {}'.format(player))
 
         self._players[position] = None
         self._in_game_logic.clear()
-        LOG.debug('===========removeplayer game logic clear')
-        player.on_exited_room(self)
+
+        player.on_exited_room()
+        LOG.debug('Send Leaveplayerntf...')
+        self.broadcast(build_notify(
+            SCMessageTypes.player_leave_ntf,
+            {
+                'position': position
+            }
+        ))
 
     @property
     def player_count(self):
