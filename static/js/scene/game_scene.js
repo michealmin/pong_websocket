@@ -191,21 +191,20 @@ class GameScene {
         var self = this;
         return function() {
             var this_scene = this;
-
+            var player_block = self._player_blocks[self._my_position];
             if (self._in_round) {
-                var player_block = self._player_blocks[self._my_position];
-                if (player_block) {
-                    if (self.cursors.left.isDown) {
-                        player_block.setVelocityX(-350);
+                if (self.cursors.left.isDown && 0 < player_block.x) {
+                    player_block.setVelocityX(-350);
 
-                    } else if (self.cursors.right.isDown) {
-                        player_block.setVelocityX(350);
+                } else if (self.cursors.right.isDown &&
+                    (player_block.x + player_block.displayWidth) < self.config.screen_size.width) {
+                    player_block.setVelocityX(350);
 
-                    } else {
-                        player_block.setVelocityX(0);
-
-                    }
+                } else {
+                    player_block.setVelocityX(0);
                 }
+            } else {
+                player_block.setVelocityX(0);
             }
         }
     }
@@ -280,7 +279,7 @@ class GameScene {
             block.setVisible(false);
 
             this._player_blocks[i] = block;
-
+            console.log(block);
 
         }
     }
