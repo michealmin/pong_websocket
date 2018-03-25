@@ -113,12 +113,16 @@ class GameState {
         return this._score
     }
 
+    set score(val) {
+        this._score = val;
+    }
+
     resetScore() {
         this._score = [0, 0];
     }
 
-    addScore(player_position) {
-        this._score[player_position] += 1;
+    setScore(score) {
+        this._score = score;
     }
 }
 
@@ -130,11 +134,16 @@ class InGameLogic extends GameMsgHandler {
         this._game_view = game_view;
         this._game_scene = game_view.game_scene;
         this._game_state = new GameState();
-        this._in_round = false;
 
         var self = this;
-        this._game_scene.on_edge_overlapped = function(loser_pos) {
-            self.onRoundFinished(loser_pos);
+        this._game_scene.on_edge_overlapped = (loser_pos) => {
+            if (loser_pos == this._game_main.my_position) {
+                this._game_main.sendMessage({
+                    type: 'RoundEnd',
+                    loser_pos: loser_pos
+                })
+            }
+
         }
 
         this._last_my_block_pos_x = -100;
@@ -144,6 +153,10 @@ class InGameLogic extends GameMsgHandler {
 
         this._registerMsgHandler("BallBlockCollideNtf", (msg) => {
             this._onBallBlockCollideNtf(msg);
+        });
+
+        this._registerMsgHandler("RoundEndNtf", (msg) => {
+            this._onRoundEndNtf(msg);
         });
     }
 
@@ -177,29 +190,21 @@ class InGameLogic extends GameMsgHandler {
     }
 
     onRoundStarted() {
-        this._in_round = true;
         this._game_scene.start_button.setVisible(false);
     }
 
-    onRoundFinished(loser_pos) {
-        if (!this._in_round) {
-            return;
-        }
-        console.log(loser_pos + ' lose');
+    startNextRound() {
+        this.onRoundStarted();
+        this._game_scene.startRound();
 
-        this._in_round = false;
 
-        if (!this.isValidPosition(loser_pos)) {
-            throw new Error("Invalid player positoin " + player_pos);
-        }
-        this._game_state.addScore(1 == loser_pos ? 0 : 1);
-        if (this.config.match_score <= Math.max(...this._game_state.score)) {
-            console.log('Game end');
-            this.processEndGame();
-        } else {
-            this.onRoundStarted();
-            this._game_scene.startRound();
-        }
+        // if (this.config.match_score <= Math.max(...this._game_state.score)) {
+        //     console.log('Game end');
+        //     this.processEndGame();
+        // } else {
+        //     this.onRoundStarted();
+        //     this._game_scene.startRound();
+        // }
     }
 
     processEndGame() {
@@ -220,15 +225,27 @@ class InGameLogic extends GameMsgHandler {
     }
 
     _onBallBlockCollideNtf(msg) {
-        console.log('onBallAndBlockCollide recved');
-        console.log('onBallAndBlockCollide recved');
-        console.log('onBallAndBlockCollide recved');
-        console.log('onBallAndBlockCollide recved');
-        console.log('onBallAndBlockCollide recved');
-        console.log('onBallAndBlockCollide recved');
-        console.log(msg);
         this._game_scene.setPlayerBlockPos(msg.position, msg.block_x);
         this._game_scene.setBallPos(msg.ball_pos[0], msg.ball_pos[1]);
+    }
+
+    _onRoundEndNtf(msg) {
+        var is_game_end = msg.winner !== undefined && msg.winner !== null;
+        console.log('RoundEndNtf');
+        console.log(msg);
+        console.log(is_game_end);
+        if (is_game_end) {
+            //ToDo : 결과창 표시 
+            this._game_main.endGame();
+        } else {
+            // ToDo 점수판 표시
+            //round end. start next round
+            console.log('Start Next round');
+            console.log(msg.score_info);
+            this._game_state.setScore(msg.score_info);
+
+            this.startNextRound(msg.score_info);
+        }
     }
 };
 

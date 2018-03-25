@@ -7,22 +7,42 @@ LOG = logging.getLogger(__name__)
 
 
 class InGameState:
+    GameScore = 2
     def __init__(self, room):
         self._room = room
 
         self.clear()
 
     def clear(self):
-        self._scores = dict()
+        self._scores = [0, 0]
         self._round = 0
+
+    @property
+    def scores(self):
+        return self._scores
+
+    def update_score(self, loser_pos):
+        pos = 0 if 1 == loser_pos else 1
+        self._scores[pos] = self._scores[pos] + 1
+
+    def is_game_end(self):
+        return InGameState.GameScore <= max(self._scores)
+
+
+    def get_winner(self):
+        if not self.is_game_end():
+            return None
+
+        return 0 if InGameState.GameScore <= self._scores[0] else 1
+
 
 
 class InGameLogic(MsgHandlerBase):
     def __init__(self, room):
         super().__init__()
         self._room = room
-        self._logic = InGameState(room)
-        self._logic.clear()
+        self._game_state = InGameState(room)
+        self._game_state.clear()
         self._is_in_game = False
 
         self._register_handler(
@@ -31,18 +51,20 @@ class InGameLogic(MsgHandlerBase):
         self._register_handler(
             CSMessageTypes.ball_block_collide, self._on_ball_block_collide)
 
+        self._register_handler(
+            CSMessageTypes.round_end, self._on_round_end)
+
     @property
     def is_in_game(self):
         return self._is_in_game
 
     @is_in_game.setter
     def is_in_game(self, val):
-        LOG.debug('===========ingame set========' + str(val))
         self._is_in_game = val
 
     def clear(self):
         self.is_in_game = False
-        self._logic.clear()
+        self._game_state.clear()
 
     def start_game(self):
 
@@ -55,8 +77,8 @@ class InGameLogic(MsgHandlerBase):
             )
         )
 
-    def end_game(self):
-        self.is_in_game = False
+    def _on_game_end(self):
+        self.clear()
 
     # msg handlers
 
@@ -79,3 +101,28 @@ class InGameLogic(MsgHandlerBase):
                 'block_x': msg['block_x']
             }
         ), player)
+
+    def _on_round_end(self, player, msg):
+        loser_pos = msg['loser_pos']
+
+        self._game_state.update_score(loser_pos)
+
+
+        winner = None
+        if self._game_state.is_game_end():
+            winner = self._game_state.get_winner()
+        score_info = self._game_state.scores
+
+        self._room.broadcast(
+            build_notify(
+                SCMessageTypes.round_end_ntf,
+                {
+                    'score_info': score_info,
+                    'winner': winner
+                }
+            )
+        )
+
+        if winner:
+            self._on_game_end()
+

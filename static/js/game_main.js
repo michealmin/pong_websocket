@@ -153,6 +153,9 @@ class GameMain {
         this.changeGameLogic("InGame");
         this._game_logic.startGame()
     }
+    endGame() {
+        this.changeGameLogic("WaitingForGame");
+    }
 }
 
 export { GameMain };
