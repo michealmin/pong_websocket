@@ -101,6 +101,9 @@ class GameMain {
     }
 
     sendMessage(message) {
+        if (!message) {
+            console.error('message is empty');
+        }
         var sock_state = this._ws.readyState;
         var msg = message;
         if (typeof message == "object") {

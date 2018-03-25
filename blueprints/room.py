@@ -41,8 +41,8 @@ def handle_room(socket):
 
         LOG.info('{} is leaving room due to error...'.format(player))
         try:
-            socket.close()
             player.exit_room()
+            socket.close()
         except:
             pass
 

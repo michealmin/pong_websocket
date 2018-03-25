@@ -147,6 +147,11 @@ class InGameLogic extends GameMsgHandler {
         this._game_scene.on_edge_overlapped = function(loser_pos) {
             self.onRoundFinished(loser_pos);
         }
+
+        this._last_my_block_pos_x = -100;
+        this._registerMsgHandler("BlockPosNtf", (msg) => {
+            this._onBlockPosNtf(msg);
+        })
     }
 
     isValidPosition(position) {
@@ -157,6 +162,18 @@ class InGameLogic extends GameMsgHandler {
         this.resetGame();
         this.onRoundStarted();
         this._game_scene.startRound();
+
+        this._game_scene.on_block_pos_sync_timer = (x) => {
+            console.log(1 < Math.abs(this._last_my_block_pos_x - x));
+            if (1 < Math.abs(this._last_my_block_pos_x - x)) {
+                console.log('blocksyncsend 2');
+                this._game_main.sendMessage({
+                    type: 'SyncBlockPos',
+                    x: x
+                });
+                this._last_my_block_pos_x = x;
+            };
+        }
     }
 
     onRoundStarted() {
@@ -187,11 +204,19 @@ class InGameLogic extends GameMsgHandler {
 
     processEndGame() {
         //ToDo : 승자 표시, 혹은 결과 표시
+        this._game_scene.resetGame();
         this._game_scene.start_button.setVisible(true);
     }
 
     resetGame() {
         this._game_state.resetScore();
+    }
+
+    //message handlers
+    _onBlockPosNtf(msg) {
+        console.log('OnBlockPosNtf');
+        console.log(msg);
+        this._game_scene.setPlayerBlockPos(msg.position, msg.x);
     }
 };
 

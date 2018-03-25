@@ -28,6 +28,7 @@ class Player:
             raise PlayerError(self, 'Not in room.')
 
         self._room.remove_player(self)
+        self._room = None
 
     def on_exited_room(self):
         self._ws.close()

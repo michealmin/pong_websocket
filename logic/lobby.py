@@ -14,7 +14,9 @@ class Lobby():
 
     def create_room(self):
         room_no = len(self._rooms)
-        return Room(room_no)
+        r = Room(room_no)
+        self._rooms.append(r)
+        return r
 
     def get_joinable_room(self):
         rooms = [ r for r in self._rooms if r.is_joinable()]

@@ -20,22 +20,39 @@ class GameScene {
         }
 
         this._on_start_clicked = undefined;
+
+        this._update_block_pos_evt = undefined;
+        this._on_update_block_pos = () => {};
+
+        this._in_round = false;
     }
 
     get config() {
         return GameConfig
     }
 
+    set my_position(pos) {
+        this._my_position = pos;
+    }
+
     set on_edge_overlapped(func) {
-        this._on_edge_overlapped = func;
+        if (func) {
+            this._on_edge_overlapped = func;
+        } else {
+            this._on_edge_overlapped = () => {};
+        }
     }
 
     set on_start_clicked(func) {
         this._on_start_clicked = func;
     }
 
-    set my_position(pos) {
-        this._my_position = pos;
+    set on_block_pos_sync_timer(func) {
+        if (func) {
+            this._on_update_block_pos = func;
+        } else {
+            this._on_update_block_pos = () => {};
+        }
     }
 
     get start_button() {
@@ -52,11 +69,20 @@ class GameScene {
         this._player_names[position].setVisible(bShow);
     }
 
+    onBlockPosSync() {
+        if (this._on_update_block_pos) {
+            var block = this._player_blocks[this._my_position];
+            this._on_update_block_pos(
+                block.x);
+        }
+    }
+
+    setPlayerBlockPos(position, x) {
+        this._player_blocks[position].setX(x);
+    }
+
     //ToDo: ui scene 으로 옮길 것
     setPlayerName(position, name) {
-        console.log('setPlayerName');
-        console.log(position);
-        console.log(name);
         this._player_names[position].setText(name);
     }
 
@@ -107,7 +133,8 @@ class GameScene {
             self.initOverlap(this_scene);
 
             self.cursors = this_scene.input.keyboard.createCursorKeys();
-
+            console.log('Time!!');
+            console.log(this_scene.time);
 
 
             //Ui Scene 으로 옯길 것들
@@ -127,6 +154,15 @@ class GameScene {
                 self._on_start_clicked();
             });
             self._start_button.setVisible(false);
+
+            this_scene.time.addEvent({
+                delay: 20,
+                loop: true,
+                callback: () => {
+                    self.onBlockPosSync();
+                }
+            });
+
             self.resetRound();
         }
     }
@@ -135,17 +171,20 @@ class GameScene {
         var self = this;
         return function() {
             var this_scene = this;
-            var player_block = self._player_blocks[self._my_position];
-            if (player_block) {
-                if (self.cursors.left.isDown) {
-                    player_block.setVelocityX(-160);
 
-                } else if (self.cursors.right.isDown) {
-                    player_block.setVelocityX(160);
+            if (self._in_round) {
+                var player_block = self._player_blocks[self._my_position];
+                if (player_block) {
+                    if (self.cursors.left.isDown) {
+                        player_block.setVelocityX(-250);
 
-                } else {
-                    player_block.setVelocityX(0);
+                    } else if (self.cursors.right.isDown) {
+                        player_block.setVelocityX(250);
 
+                    } else {
+                        player_block.setVelocityX(0);
+
+                    }
                 }
             }
         }
@@ -154,6 +193,13 @@ class GameScene {
     resetGame() {
         this.resetRound();
         this.ball.setMaxVelocity(100, 800);
+        this._in_round = false;
+        var block_pos_and_size = this.config.player_block_pos_size;
+        for (var i = 0; i < block_pos_and_size.length; ++i) {
+            var pos_and_size = block_pos_and_size[i];
+            this.setPlayerBlockPos(i, pos_and_size.x);
+        }
+
     }
 
     resetRound() {
@@ -163,14 +209,15 @@ class GameScene {
         this.ball.setPosition(screen_size.width / 2, screen_size.height / 2);
         this.ball.setVisible(false);
         this.ball_emitter.setVisible(false);
+        this._in_round = false;
     }
 
     startRound() {
         this.resetRound();
-        // round_finished = false;
         this.ball.setVelocity(200, 200);
         this.ball.setVisible(true);
         this.ball_emitter.setVisible(true);
+        this._in_round = true;
     }
 
     createBall(this_scene) {

@@ -12,17 +12,17 @@ class MsgReservedField:
 class CSMessageTypes:
     enter_room = 'EnterRoom'
     start_game = 'StartGame'
+    sync_block_pos = 'SyncBlockPos'
 
 
 # Svr -> Cli
 class SCMessageTypes:
     entered_room = 'EnteredRoom'
 
-
-# Notify
-class ScMessgeNotifyTypes:
+    #ntf
     enter_room_ntf = 'EnteredRoomNtf'
     start_game_ntf = 'StartGameNtf'
+    block_pos_ntf = 'BlockPosNtf'
 
 
 def build_notify(msg_type, data):
