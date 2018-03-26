@@ -1,6 +1,7 @@
 @media (min-width: 650px) {
     .container{
         max-width: 700px;
+
         margin-top: 20px;
     }
 }
@@ -9,6 +10,7 @@
 html body {
     /*background-color: rgba(0,0,0,1.00);*/
     background: linear-gradient(rgb(0,0,204), rgba(153, 204, 255, 0.2));
+    min-width: 650px;
     height: 100%;
     margin: 0;
     background-repeat: no-repeat;

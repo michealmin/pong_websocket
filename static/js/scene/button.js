@@ -8,7 +8,7 @@ class Button {
         button.setScale(4, 3);
         this._button = button;
 
-        var text = scene.add.bitmapText(x - 40, y - 20, 'hyperdrive', text, 34);
+        var text = scene.add.bitmapText(x - 40, y - 20, 'shortStack', text, 34);
         text.x += (button.width - text.width) / 2;
         this._text = text;
 

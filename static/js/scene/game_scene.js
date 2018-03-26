@@ -138,12 +138,12 @@ class GameScene {
                 frameWidth: 80,
                 frameHeight: 20
             });
-            this_scene.load.bitmapFont('hyperdrive', 'assets/fonts/bitmap/hyperdrive.png', 'assets/fonts/bitmap/hyperdrive.xml');
+            this_scene.load.bitmapFont('shortStack', 'assets/fonts/bitmap/shortStack.png', 'assets/fonts/bitmap/shortStack.xml');
 
             this_scene.load.image('sky', 'assets/skies/sky.png');
             this_scene.load.image('ball', 'assets/sprites/aqua_ball.png');
             this_scene.load.image('red', 'assets/particles/red.png');
-            this_scene.load.image('block', 'assets/sprites/50x50-white.png');
+            this_scene.load.image('block', 'assets/sprites/crate.png');
         }
     }
 
@@ -154,8 +154,8 @@ class GameScene {
             // Create world
             this_scene.add.image(400, 300, 'sky');
 
-            this_scene.physics.world.createDebugGraphic();
-            this_scene.physics.world.drawDebug = true;
+            // this_scene.physics.world.createDebugGraphic();
+            // this_scene.physics.world.drawDebug = true;
 
             self.createBall(this_scene);
             self.createPlayerBlocks(this_scene);
@@ -170,7 +170,7 @@ class GameScene {
             var screen_size = self.config.screen_size;
             var x = (screen_size.width / 2);
             var y = (screen_size.height / 2);
-            self._start_button = new Button(this_scene, 'Start', 'StartText', 300, y, function() {
+            self._start_button = new Button(this_scene, 'Start', 'Start', 300, y, function() {
                 self._on_start_clicked();
             });
             self._start_button.setVisible(false);
@@ -275,7 +275,7 @@ class GameScene {
             block.setOrigin(0, 0);
             block.setDisplaySize(pos_and_size.width, pos_and_size.height);
 
-            block.setDebug(true, true, true);
+            // block.setDebug(true, true, true);
             block.setVisible(false);
 
             this._player_blocks[i] = block;
@@ -297,7 +297,7 @@ class GameScene {
 
             var pos_and_size = board_pos_and_size[i].score;
             var score_text = this_scene.add.text(pos_and_size.x, pos_and_size.y, "0", {
-                fontSize: 15,
+                fontSize: 18,
                 fontFamily: 'Arial',
                 color: '#009900'
                     // fixedWidth: pos_and_size.width,

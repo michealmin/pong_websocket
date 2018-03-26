@@ -36,7 +36,7 @@ class GameView {
             parent: screen_parent,
             width: screen_size.width,
             height: screen_size.height,
-            debugShowBody: true,
+            debugShowBody: false,
             physics: {
                 default: 'arcade',
                 arcade: {
