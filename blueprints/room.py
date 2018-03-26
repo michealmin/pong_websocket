@@ -23,7 +23,7 @@ def handle_room(socket):
         player = Player(msg['name'], socket)
         token = msg['token']
 
-        if( lobby_instance.process_enter_room(player, room_no, token) ):
+        if(lobby_instance.process_enter_room(player, room_no, token)):
             while not socket.closed:
                 msg = socket.receive()
                 if None is msg:
@@ -32,6 +32,8 @@ def handle_room(socket):
                 LOG.info('Message received. player : {} msg: {}'.format(player, msg))
                 msg = json.loads(msg)
                 player.process_message(msg)
+        else:
+            raise Exception('Room is full')
 
     except Exception as e:
         import traceback

@@ -31,9 +31,8 @@ class Lobby():
             raise errors.LobbyError('Invalid token')
 
         room = self._rooms[room_no]
-        # ToDo : 방이 차있으면 에러 전달
+        # ToDo : 방이 꽉 차 있으면 에러 전달
         room.add_player(player)
-        # ToDo : Player dㅔ서 onmessage 뜨면 룸으로 전달하게
         return True;
 
 
