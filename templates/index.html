@@ -2,12 +2,24 @@
 <html>
 
 <head>
-    <meta charset="UTF-8" />
+    <meta charset="UTF-8"/>
     <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet"
+          href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+          integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"
+          crossorigin="anonymous">
 
+    <!-- Optional theme -->
+    <link rel="stylesheet"
+          href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css"
+          integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp"
+          crossorigin="anonymous">
+
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"
+            integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
+            crossorigin="anonymous"></script>
     <script src="/static/phaser.js"></script>
     <!-- <script type="module" src="static/js/game_main.js"></script> -->
     <link rel="stylesheet" type="text/css" href="static/css/main.css">
@@ -81,20 +93,39 @@
 </head>
 
 <body>
-    <div class="status">
-        <p class="status"></p>
-    </div>
+<div class="container">
+    <div class="panel panel-info">
+        <div class="panel-heading">
+            <div class="status">
+                <p class="status bg-warning"></p>
+            </div>
 
-    <div class="login-screen">
-        <label for="player-name">이름</label>
-        <input type="text" id="player-name" />
-        <button id="login">로그인</button>
-    </div>
+            <div class="login-screen">
+                <div class="form-group">
+                    <label for="player-name">이름</label>
+                    <input type="text" class="form-control" id="player-name"
+                           placeholder="게임에서 사용할 이름">
+                    <small id="emailHelp" class="form-text text-muted">
+                        게임 내에서 표시할 이름을 입력합니다.
+                    </small>
+                </div>
 
-    <div class="game-screen" style="display:None;">
-        <button id="exit-room">나가기</button>
-
+                <!--<div class="login-name">-->
+                <!--<label for="player-name">이름</label>-->
+                <!--<input type="text" id="player-name"/>-->
+                <!--</div>-->
+                <div class="login-btn">
+                    <button id="login" class="btn btn-primary">로그인</button>
+                </div>
+            </div>
+        </div>
+        <div class="panel-body">
+            <div class="game-screen" style="display:None;">
+                <button id="exit-room" class="btn btn-danger">나가기</button>
+            </div>
+        </div>
     </div>
+</div>
 </body>
 
 </html>

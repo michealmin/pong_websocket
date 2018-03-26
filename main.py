@@ -2,7 +2,7 @@ import logging
 from flask_sockets import Sockets
 from werkzeug.serving import run_with_reloader
 from werkzeug.debug import DebuggedApplication
-from flask import Flask, Blueprint, send_file
+from flask import Flask, render_template
 from blueprints.lobby import lobby
 from blueprints.room import room
 
@@ -44,7 +44,8 @@ sockets.register_blueprint(room, url_prefix=r'/room')
 
 @app.route('/')
 def main():
-    return send_file('main.html')
+    # return send_file('main.html')
+    return render_template('index.html')
 
 @run_with_reloader
 def run_server():

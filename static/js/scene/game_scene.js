@@ -224,7 +224,7 @@ class GameScene {
     resetRound() {
         var screen_size = this.config.screen_size;
         this._ball.setVelocity(0, 0);
-        this._ball.setBounce(0.5, 1.05);
+        this._ball.setBounce(0.5, 1.5);
         this._ball.setPosition(screen_size.width / 2, screen_size.height / 2);
         this._ball.setVisible(false);
         this._ball_emitter.setVisible(false);
