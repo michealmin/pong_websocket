@@ -1,12 +1,10 @@
 "use strict";
 
-import { GameCommon } from "./game_common.js";
-import { GameModel } from "./game_model.js";
 import { GameView } from "./game_view.js";
-import { WaitingForGameLogic, InGameLogic } from "./game_logic.js";
+import { InGameLogic } from "./game_logic/in_game_logic.js";
+import { WaitingForGameLogic } from "./game_logic/waiting_for_game_logic.js";
 
-var game_model = new GameModel();
-
+``
 class Player {
     constructor(position, name) {
         this.name = name;
@@ -100,7 +98,7 @@ class GameMain {
         }
     }
 
-    onSeocketError(evt) {
+    onSocketError(evt) {
         console.error('Socket error ');
         console.error(evt);
         if (this._on_con_closed) {
