@@ -70,6 +70,7 @@
 
         function login() {
             console.log('Start login...');
+            $('div.status p.status').text('');
             $.ajax({
                 url: '/lobby/room',
                 type: "POST",

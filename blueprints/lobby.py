@@ -31,7 +31,6 @@ def enter_room():
         {'exp': cur_timestamp + 1000, 'room_no': room.room_no},)
 
     dec = jwt_token.decode_jwt(token)
-    print(dec)
 
     return jsonify(
         {

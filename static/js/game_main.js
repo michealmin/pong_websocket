@@ -30,10 +30,8 @@ class GameMain {
     setPlayer(position, name, is_me) {
         this._players.set(position, new Player(position, name));
         if (is_me) {
-            console.log('add Myself');
             this._my_position = position;
             this._game_view.game_scene.my_position = position;
-            console.log(this._my_position);
         }
     }
 

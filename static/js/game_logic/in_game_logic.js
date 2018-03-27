@@ -86,19 +86,9 @@ class InGameLogic extends GameMsgHandler {
     startNextRound() {
         this._in_round = true;
         this._game_scene.startRound();
-
-
-        // if (this.config.match_score <= Math.max(...this._game_state.score)) {
-        //     console.log('Game end');
-        //     this.processEndGame();
-        // } else {
-        //     this.onRoundStarted();
-        //     this._game_scene.startRound();
-        // }
     }
 
     processEndGame() {
-        //ToDo : 승자 표시, 혹은 결과 표시
         this._game_scene.on_block_pos_sync_timer = (x) => {};
         this._game_scene.on_my_block_and_ball_collide = () => {};
         this._game_scene.resetGame();

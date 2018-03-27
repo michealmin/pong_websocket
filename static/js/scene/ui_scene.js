@@ -23,25 +23,9 @@ class UIScene {
     }
 
     setStausText(text) {
-            this._center_text.setText(text);
-        }
-        /*
-            get preload() {
-                var self = this;
-                return function() {
-                    var this_scene = this;
+        this._center_text.setText(text);
+    }
 
-                    var base_url = self._url_base + '/static/';
-                    this_scene.load.setBaseURL(base_url);
-                    this_scene.load.spritesheet('button', 'assets/ui/flixel-button.png', {
-                        frameWidth: 80,
-                        frameHeight: 20
-                    });
-                    console.log(this_scene);
-                    this_scene.load.bitmapFont('hyperdrive', 'assets/fonts/bitmap/hyperdrive.png', 'assets/fonts/bitmap/hyperdrive.xml');
-                }
-            }
-        */
     get create() {
         var self = this;
         return function() {

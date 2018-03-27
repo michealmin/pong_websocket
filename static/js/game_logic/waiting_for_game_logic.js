@@ -25,10 +25,6 @@ class WaitingForGameLogic extends GameMsgHandler {
     }
 
     checkAndShowStartBtn() {
-        console.log('checkAndShowStartBtn');
-        console.log(2 <= this._game_main.players.size &&
-            0 == this._game_main.my_position);
-
         if (2 <= this._game_main.players.size &&
             0 == this._game_main.my_position) {
 

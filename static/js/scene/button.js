@@ -30,7 +30,6 @@ class Button {
         scene.input.on('gameobjectdown', function(pointer, btn) {
             if (btn.key == self._button.key) {
                 self.setButtonFrame(2);
-                // setVisible(false);
                 self.on_click_handler();
             }
 

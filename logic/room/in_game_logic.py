@@ -2,12 +2,13 @@ from common.message import *
 from common.errors import ProtocolError
 from logic.room.msg_handler import MsgHandlerBase
 import logging
+from config import Config
 
 LOG = logging.getLogger(__name__)
 
 
 class InGameState:
-    GameScore = 2
+
     def __init__(self, room):
         self._room = room
 
@@ -26,7 +27,7 @@ class InGameState:
         self._scores[pos] = self._scores[pos] + 1
 
     def is_game_end(self):
-        return InGameState.GameScore <= max(self._scores)
+        return Config.GameScore <= max(self._scores)
 
 
     def get_winner(self):

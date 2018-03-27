@@ -7,18 +7,14 @@ import { Button } from "./button.js";
 class GameScene {
     constructor(url_base) {
         this._player_blocks = Array(2);
-        //ToDo : ui scene 으로 옮길 것
         this._player_names = Array(2);
         this._player_scores = Array(2);
         this._ball = null;
         this.edges = Object();
-        this._my_position = -1; //invalid
+        this._my_position = -1;
         this._url_base = url_base;
 
-        //callbacks
-        this._on_edge_overlapped = function(player_position) {
-            console.log('overlapped ' + player_position);
-        }
+        this._on_edge_overlapped = function(player_position) {}
 
         this._on_start_clicked = undefined;
 
@@ -102,7 +98,6 @@ class GameScene {
         this._ball.setY(y);
     }
 
-    //ToDo: ui scene 으로 옮길 것
     setPlayerName(position, name) {
         this._player_names[position].setText(name);
     }
@@ -154,9 +149,6 @@ class GameScene {
             // Create world
             this_scene.add.image(400, 300, 'sky');
 
-            // this_scene.physics.world.createDebugGraphic();
-            // this_scene.physics.world.drawDebug = true;
-
             self.createBall(this_scene);
             self.createPlayerBlocks(this_scene);
             self.createScoreBoard(this_scene);
@@ -199,9 +191,6 @@ class GameScene {
                 } else if (self.cursors.right.isDown &&
                     (player_block.x + player_block.displayWidth) < self.config.screen_size.width) {
                     player_block.setVelocityX(350);
-                    console.log('right isdown');
-                    console.log(self.cursors.right.isUp);
-
                 } else {
                     player_block.setVelocityX(0);
                 }
@@ -281,8 +270,6 @@ class GameScene {
             block.setVisible(false);
 
             this._player_blocks[i] = block;
-            console.log(block);
-
         }
     }
 
@@ -302,8 +289,6 @@ class GameScene {
                 fontSize: 18,
                 fontFamily: 'Arial',
                 color: '#009900'
-                    // fixedWidth: pos_and_size.width,
-                    // fixedHeight: pos_and_size.height
             });
             score_text.setAlign('center');
             score_text.setWordWrapWidth(pos_and_size.height, false);
@@ -315,8 +300,6 @@ class GameScene {
     }
 
     createEdges(this_scene) {
-        //add bounds
-        //ToDo: 아래는 지형으로 바꿀 것
         var edges_pos_and_size = this.config.edge_pos_size;
 
         function createEdge(pos_and_size) {
