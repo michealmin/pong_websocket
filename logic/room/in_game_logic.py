@@ -34,7 +34,7 @@ class InGameState:
         if not self.is_game_end():
             return None
 
-        return 0 if InGameState.GameScore <= self._scores[0] else 1
+        return 0 if Config.GameScore <= self._scores[0] else 1
 
 
 
