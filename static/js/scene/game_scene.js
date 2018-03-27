@@ -199,6 +199,8 @@ class GameScene {
                 } else if (self.cursors.right.isDown &&
                     (player_block.x + player_block.displayWidth) < self.config.screen_size.width) {
                     player_block.setVelocityX(350);
+                    console.log('right isdown');
+                    console.log(self.cursors.right.isUp);
 
                 } else {
                     player_block.setVelocityX(0);
@@ -211,7 +213,7 @@ class GameScene {
 
     resetGame() {
         this.resetRound();
-        this._ball.setMaxVelocity(100, 800);
+        this._ball.setMaxVelocity(100, 400);
         this._in_round = false;
         var block_pos_and_size = this.config.player_block_pos_size;
         for (var i = 0; i < block_pos_and_size.length; ++i) {
@@ -224,7 +226,7 @@ class GameScene {
     resetRound() {
         var screen_size = this.config.screen_size;
         this._ball.setVelocity(0, 0);
-        this._ball.setBounce(0.5, 1.5);
+        this._ball.setBounce(1, 1.03);
         this._ball.setPosition(screen_size.width / 2, screen_size.height / 2);
         this._ball.setVisible(false);
         this._ball_emitter.setVisible(false);
